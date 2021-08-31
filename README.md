@@ -6,7 +6,7 @@ The goal of this challenge is to build a solution comprised of REST APIs that fi
 * Each ship has a name, a unique IMO number, geolocation (current longitude and latitude of the ship) and velocity. Develop basic REST APIs to manage ships.
 * Develop an API which returns the details of closest port and estimated arrival time of given ship.
 
-You must use C# for this solution.
+Using C# is a must for this solution. Aside from that, feel free to use other technologies/tools/frameworks/libraries ...etc
 
 ## User Stories
 1. As a user, I want to be able to add ships to the system.
