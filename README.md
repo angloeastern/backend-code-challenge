@@ -4,9 +4,9 @@ The goal of this challenge is to build a solution comprised of REST APIs that fi
 
 * Each port has a name and geolocation. Seed your solution with initial (or randomly generated) port data. No REST API is required for creating ports. 
 * Each ship has a name, a unique ship id, geolocation (current longitude and latitude of the ship) and velocity. Develop basic REST APIs to manage ships.
-* Develop an API which returns the details of closest port and estimated arrival time of given ship.
+* Develop an API which returns the details of closest port and estimated arrival time of given ship to the closest port.
 
-Using C# is a must for this solution. Aside from that, feel free to use other technologies/tools/frameworks/libraries ...etc
+Using C# is a must for this solution. Aside from that, feel free to use any technologies/tools/frameworks/libraries ...etc you prefer. Deliver time should not be longer than a week.
 
 ## Stories
 1. As a consumer of the API, I want to be able to add ships to the system.
@@ -16,9 +16,11 @@ Using C# is a must for this solution. Aside from that, feel free to use other te
 
 ## Deliverable
 
-Create github repo and share the link with us via e-mail.
+Create a github repo and share the link with us via e-mail.
 
 ## What are we looking for?
+
+Following aspects will be taken into the consideration while evaluating the solution.
 
 * Code quality and testing
 * Code structure
