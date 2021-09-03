@@ -20,7 +20,7 @@ Create a github repo and share the link with us via e-mail.
 
 ## What are we looking for?
 
-Following aspects will be taken into the consideration while evaluating the solution.
+Following aspects will be taken into the consideration for the evaluation:
 
 * Code quality and testing
 * Code structure
