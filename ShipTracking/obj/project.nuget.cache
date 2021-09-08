@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "rhL5RMEoux1XBlANCdsfGuhCibG0wfIlGu3+6gkudpB6u0AJxh3zt32xZfCOIlpxiH8Nm+1u1whZFgG1ErK/6Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Dante\\source\\repos\\ShipTracking\\ShipTracking\\ShipTracking.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Dante\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.10.14\\microsoft.visualstudio.azure.containers.tools.targets.1.10.14.nupkg.sha512"
+  ],
+  "logs": []
+}

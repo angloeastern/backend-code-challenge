@@ -1,0 +1,9 @@
+C:\Users\Dante\source\repos\ShipTracking\Domain\bin\Debug\netcoreapp3.1\Domain.deps.json
+C:\Users\Dante\source\repos\ShipTracking\Domain\bin\Debug\netcoreapp3.1\Domain.dll
+C:\Users\Dante\source\repos\ShipTracking\Domain\bin\Debug\netcoreapp3.1\Domain.pdb
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.csproj.AssemblyReference.cache
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.AssemblyInfoInputs.cache
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.AssemblyInfo.cs
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.csproj.CoreCompileInputs.cache
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.dll
+C:\Users\Dante\source\repos\ShipTracking\Domain\obj\Debug\netcoreapp3.1\Domain.pdb
