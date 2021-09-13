@@ -1,8 +1,10 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrustructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrustructure.Repositories
 {
@@ -16,23 +18,23 @@ namespace Infrustructure.Repositories
             _context = context;
         }
 
-        public IEnumerable<Ship> GetShips()
+        public async Task<IEnumerable<Ship>> GetShipsAsync()
         {
-            return _context.Ships;
+            return await _context.Ships.ToListAsync();
         }
 
-        public Ship GetShip(int id)
+        public async Task<Ship> GetShipAsync(int id)
         {
-            return _context.Ships.FirstOrDefault(x => x.Id == id);
+            return await _context.Ships.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public void CreateShip(Ship ship)
+        public async void CreateShip(Ship ship)
         {
             _context.Ships.Add(ship);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(); 
         }
 
-        public void UpdateVelocity(int id, Ship ship)
+        public async void UpdateVelocity(int id, Ship ship)
         {
             var item = _context.Ships.FirstOrDefault(x => x.Id == id);
             if (item != null)
@@ -41,7 +43,7 @@ namespace Infrustructure.Repositories
                 _context.Ships.Update(item);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,16 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Domain.Models;
+﻿using Domain.Models;
 using RestSharp;
-using RestSharp.Serialization.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrustructure.Integration
 {
-    public interface ISeaRoutesClient
-    {
-        Task<SeaRoutesResult> GetClosestPort(SeaRoutesRequest requestParams);
-    }
-
     public class SeaRoutesClient : ISeaRoutesClient
     {
         private readonly IRestClient _restClient;
@@ -20,11 +14,11 @@ namespace Infrustructure.Integration
             _restClient = restClient;
         }
 
-        public async Task<SeaRoutesResult> GetClosestPort(SeaRoutesRequest requestParams)
+        public async Task<SeaRoutesResult> GetClosestPortAsync(SeaRoutesRequest requestParams, CancellationToken cancellationToken= default)
         {
             var req = new RestRequest($"route/lon:{requestParams.StartCoordLon}lat:{requestParams.StartCoordLat}/lon:{requestParams.EndCoordLon}lat:{requestParams.EndCoordLat}");
             req.AddQueryParameter("speed", requestParams.Velocity.ToString());
-            return await _restClient.GetAsync<SeaRoutesResult>(req, CancellationToken.None);
+            return await _restClient.GetAsync<SeaRoutesResult>(req, cancellationToken);
         }
     }
 

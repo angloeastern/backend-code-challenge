@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Dto;
 using Application.Interfaces;
-using Application.Mappers;
 using Domain.Interfaces;
 
 namespace Application.Services
@@ -17,9 +17,9 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public List<PortDTO> GetPorts()
+        public async Task<List<PortDTO>> GetPortsAsync()
         {
-            return _mapper.Map(_repository.GetPorts());
+            return _mapper.Map(await _repository.GetPortsAsync());
         }
     }
 }

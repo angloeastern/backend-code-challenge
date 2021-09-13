@@ -22,9 +22,9 @@ namespace UnitTest
             };
         }
 
-        public List<PortDTO> GetPorts()
+        public async Task<List<PortDTO>> GetPortsAsync()
         {
-            return _ports;
+            return await Task.Run(() => _ports);
         }
     }
 }

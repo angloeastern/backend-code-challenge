@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Dto;
 
 namespace Application.Interfaces
 {
     public interface IPortService
     {
-        List<PortDTO> GetPorts();
+        Task<List<PortDTO>> GetPortsAsync();
     }
 }

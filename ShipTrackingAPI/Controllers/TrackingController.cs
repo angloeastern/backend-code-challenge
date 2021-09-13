@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Application.Dto;
+﻿using Application.Dto;
 using Application.Interfaces;
-using Domain.Entities;
 using Domain.Models;
 using Infrustructure.Integration;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ShipTrackingAPI.Controllers
 {
@@ -16,13 +12,11 @@ namespace ShipTrackingAPI.Controllers
     [ApiController]
     public class TrackingController : ControllerBase
     {
-        private readonly IPortService _portService;
         private readonly IShipService _shipService;
         private readonly ISeaRoutesClient _client;
 
-        public TrackingController(IPortService portService, IShipService shipService, ISeaRoutesClient client)
+        public TrackingController(IShipService shipService, ISeaRoutesClient client)
         {
-            _portService = portService;
             _shipService = shipService;
             _client = client;
         }
@@ -32,15 +26,15 @@ namespace ShipTrackingAPI.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult<IEnumerable<ShipDTO>> GetShips()
+        public async Task<ActionResult<IEnumerable<ShipDTO>>> GetShips()
         {
-            return Ok(_shipService.GetShips());
+            return  Ok(await _shipService.GetShips());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ShipDTO> GetShip(int id)
+        public async Task<ActionResult<ShipDTO>> GetShip(int id)
         {
-            return _shipService.GetShip(id);
+            return await _shipService.GetShip(id);
         }
 
         /// <summary>
@@ -76,11 +70,11 @@ namespace ShipTrackingAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetClosestPort(int shipId)
+        public async Task<IActionResult> GetClosestPort(int shipId)
         {
-            var ship = _shipService.GetShip(shipId);
+            var ship = await _shipService.GetShip(shipId);
 
-            var closestPort = _client.GetClosestPort(new SeaRoutesRequest()
+            var closestPort = await _client.GetClosestPortAsync(new SeaRoutesRequest()
             {
                 StartCoordLat = ship.Lat,
                 StartCoordLon = ship.Lon,

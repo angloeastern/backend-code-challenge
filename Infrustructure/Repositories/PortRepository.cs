@@ -1,22 +1,24 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Infrustructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Infrustructure.Repositories
 {
     public class PortRepository : IPortRepository
     {
-        public AppDbContext _context;
+        public readonly AppDbContext _context;
 
         public PortRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<Port> GetPorts()
+        public async Task<IEnumerable<Port>> GetPortsAsync()
         {
-            return _context.Ports;
+            return await _context.Ports.ToListAsync();
         }
     }
 }

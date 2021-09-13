@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using Application.Dto;
+﻿using Application.Dto;
 using Application.Interfaces;
-using Application.Mappers;
-using Domain.Entities;
 using Domain.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -18,24 +17,24 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ShipDTO> GetShips()
+        public async Task<IEnumerable<ShipDTO>> GetShips()
         {
-            return _mapper.Map(_repository.GetShips());
+            return _mapper.Map(await _repository.GetShipsAsync());
         }
 
-        public ShipDTO GetShip(int id)
+        public async Task<ShipDTO> GetShip(int id)
         {
-            return _mapper.Map(_repository.GetShip(id));
+            return _mapper.Map(await _repository.GetShipAsync(id));
         }
 
         public void CreateShip(ShipDTO ship)
         {
-            _repository.CreateShip(_mapper.Map(ship));
+           _repository.CreateShip(_mapper.Map(ship));
         }
 
         public void UpdateVelocity(int id, ShipDTO ship)
         {
-            _repository.UpdateVelocity(id, _mapper.Map(ship));
+           _repository.UpdateVelocity(id, _mapper.Map(ship));
         }
     }
 }

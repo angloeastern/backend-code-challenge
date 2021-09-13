@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Models;
+﻿using Domain.Models;
 using Infrustructure.Integration;
 using RestSharp;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace UnitTest
 {
@@ -29,11 +25,11 @@ namespace UnitTest
         }
 
 
-        public Task<SeaRoutesResult> GetClosestPort(SeaRoutesRequest requestParams)
+        public Task<SeaRoutesResult> GetClosestPortAsync(SeaRoutesRequest requestParams, CancellationToken cancellationToken = default)
         {
             var req = new RestRequest(resource: $"route/lon:{requestParams.StartCoordLon}lat:{requestParams.StartCoordLat}/lon:{requestParams.EndCoordLon}lat:{requestParams.EndCoordLat}");
             req.AddQueryParameter(name: "speed", value: requestParams.Velocity.ToString());
-            return _restClient.GetAsync<SeaRoutesResult>(request: req, cancellationToken: CancellationToken.None);
+            return _restClient.GetAsync<SeaRoutesResult>(request: req, cancellationToken);
         }
 
         public static SeaRoutesRequest GetRequest() => _request;

@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Application.Dto;
+using Application.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Application.Dto;
-using Application.Interfaces;
 
 namespace UnitTest
 {
@@ -21,16 +20,17 @@ namespace UnitTest
                     new ShipDTO() {Id = 11145,Name = "Ship2",Velocity = 10,Lat = "33.123456",Lon ="28.123456" },
                     new ShipDTO() {Id = 6698,Name = "Ship3",Velocity = 19,Lat ="44.123456" ,Lon = "25.123456"},
                 };
+            _random = new Random();
         }
 
-        public IEnumerable<ShipDTO> GetShips()
+        public async Task<IEnumerable<ShipDTO>> GetShips()
         {
-            return _ships;
+            return await Task.Run(() => _ships);
         }
 
-        public ShipDTO GetShip(int id)
+        public async Task<ShipDTO> GetShip(int id)
         {
-            return _ships.FirstOrDefault(predicate: x => x.Id == id);
+            return await Task.Run(() => _ships.FirstOrDefault(predicate: x => x.Id == id));
         }
 
         public void CreateShip(ShipDTO ship)

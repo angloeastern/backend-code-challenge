@@ -56,7 +56,7 @@ namespace ShipTrackingAPI
 
         private static void RegisterServices(IServiceCollection services)
         {
-            DependencyContainer.RegisterServices(services);
+            services.RegisterServices();
         }
     }
 }
