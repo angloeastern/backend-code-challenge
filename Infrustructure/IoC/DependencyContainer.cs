@@ -11,10 +11,10 @@ namespace Infrustructure.IoC
 
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddScoped<IShipService, ShipService>();
-            services.AddScoped<IPortService, PortService>();
-            services.AddScoped<IRestClient, RestClient>();
-            services.AddScoped<ISeaRoutesClient, SeaRoutesClient>();
+            services.AddTransient<IShipService, ShipService>();
+            services.AddTransient<IPortService, PortService>();
+            services.AddTransient<IRestClient, RestClient>();
+            services.AddTransient<ISeaRoutesClient, SeaRoutesClient>();
         }
     }
 }
