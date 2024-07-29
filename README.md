@@ -9,7 +9,8 @@ The goal of this challenge is to build a solution comprised of REST APIs that fi
 
 Using C# is a must for this solution. xUnit is a must for testing. 
 Aside from that, feel free to use any technologies/tools/frameworks/libraries ...etc you prefer. 
-Test delivery time should not be longer than a week.
+
+Challenge delivery time should not be longer than a week.
 
 ## Stories
 1. As a consumer of the API, I want to be able to add users to the system.
