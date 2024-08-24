@@ -1,6 +1,9 @@
 run:
 	docker compose up -d
 
+watch:
+	docker compose watch
+
 destroy:
 	docker compose down
 
