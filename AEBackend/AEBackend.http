@@ -1,0 +1,6 @@
+@AEBackend_HostAddress = http://localhost:5151
+
+GET {{AEBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
