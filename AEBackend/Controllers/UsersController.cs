@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using AEBackend.DTOs;
 
 namespace AEBackend.Controllers;
 
@@ -6,11 +7,11 @@ namespace AEBackend.Controllers;
 [Route("[controller]")]
 public class UsersController : ControllerBase
 {
-  private readonly ILogger<UsersController> _logger;
 
-  public UsersController(ILogger<UsersController> logger)
+
+  public UsersController()
   {
-    _logger = logger;
+
   }
 
   [HttpGet(Name = "Users")]

@@ -13,3 +13,6 @@ destroy-image: destroy
 
 runb-server: destroy
 	docker compose up server --build -d
+
+test:
+	docker build -t dotnet-docker-image-test --progress=plain --no-cache --target build .

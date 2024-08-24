@@ -1,4 +1,4 @@
-namespace AEBackend;
+namespace AEBackend.DTOs;
 
 public class WeatherForecast
 {

@@ -51,7 +51,15 @@ Should you have any questions, feel free to send us an e-mail.
 
 ## How to Run
 
-1. Setup the HTTP first:
+1. Create `db/password.txt`. Fill in with any password, let say:
+
+```
+Abcd1234
+```
+
+This password will be used for the `db` service on `compose.yaml`.
+
+2. Setup the HTTP first:
 
 - Mac OS
 
@@ -67,13 +75,13 @@ dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p password
 dotnet dev-certs https --trust
 ```
 
-2. Run
+3. Run
 
 ```
 make
 ```
 
-3. Call the API in
+4. Call the API in
 
 ```
 https://localhost/
