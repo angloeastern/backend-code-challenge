@@ -4,7 +4,7 @@
 - [ ] Writing basic integration tests with WebApplicationFactory
 - [ ] Add API Versioning
   - [ ] Managing API Versions in Swagger
-  - [ ] https://medium.com/@celery_liu/asp-net-core-web-api-with-swagger-api-versioning-for-dotnet-8-c8ce2fd7808c
+  - [x] https://medium.com/@celery_liu/asp-net-core-web-api-with-swagger-api-versioning-for-dotnet-8-c8ce2fd7808c
 - [ ] Generating a code coverage report
 - [ ] CI/CD for ASP.NET Core Using Azure Pipelines and GitHub Actions
 - [ ] Handling exceptions
