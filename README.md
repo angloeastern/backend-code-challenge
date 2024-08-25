@@ -1,3 +1,9 @@
+# TASKS
+
+- [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
+- [ ] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
+- [ ] as
+
 # AE Backend Code Challenge
 
 The goal of this challenge is to build a solution comprised of REST APIs that finds the closest port to a given ship and calculates the estimated arrival time based on velocity and geolocation (longitude and latitude) of given ship. Requirements are:
@@ -11,6 +17,68 @@ Using C# is a must for this solution. xUnit is a must for testing.
 Aside from that, feel free to use any technologies/tools/frameworks/libraries ...etc you prefer.
 
 Challenge delivery time should not be longer than a week.
+
+## Domain Models
+
+```mermaid
+classDiagram
+
+class Port {
+  <<AggregateRoot>>
+  string Id
+  string Name
+  Geolocation Geolocation;
+}
+
+class Geolocation {
+  <<ValueObject>>
+  Latitude Latitude;
+  Longitude Longitude;
+}
+
+class Latitude{
+  <<ValueObject>>
+  double Value;
+}
+
+class Longitude{
+  <<ValueObject>>
+  double Value;
+}
+
+class User {
+  <<AggregateRoot>>
+  string Id
+  string Name
+}
+
+class Role {
+  string Name
+}
+
+class Ship {
+  <<AggregateRoot>>
+  string Id;
+  string Name;
+  Geolocation Geolocation;
+  Velocity velocity;
+
+  TimeSpan EstimateArrivalTo(Port port)
+}
+
+class Velocity {
+  <<ValueObject>>
+
+  double Value;
+}
+
+User "1" *-- "1" Role: Role
+User "1" *-- "0..*" Ship: Ships
+
+
+
+
+```
 
 ## Stories
 
