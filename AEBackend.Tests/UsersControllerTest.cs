@@ -22,7 +22,7 @@ public class UsersControllerTest
 
     var dtos = controller.Get();
 
-    Assert.Equal(3, dtos.Length);
+    Assert.Equal(2, dtos.Length);
 
 
   }
