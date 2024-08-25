@@ -1,5 +1,7 @@
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AEBackend;
 
@@ -41,10 +43,21 @@ public class Program
         builder.Logging.AddConsole();
 
         builder.Services.AddTransient<Seeder>();
+        builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
-
+        builder.Services.AddApiVersioning(
+            options =>
+            {
+                options.ReportApiVersions = true;
+            })
+        .AddApiExplorer(
+            options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
+        // builder.Services.AddEndpointsApiExplorer().AddApiVersioning();
         builder.Services.AddSwaggerGen();
         builder.Services.AddCors(options =>
         {
@@ -67,7 +80,15 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(
+                    options =>
+                    {
+                        var descriptions = app.DescribeApiVersions();
+                        foreach (var description in descriptions)
+                        {
+                            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                        }
+                    });
         }
 
         app.UseHttpsRedirection();

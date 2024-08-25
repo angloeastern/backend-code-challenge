@@ -1,10 +1,21 @@
 # TASKS
 
 - [ ] Add system user
-- [ ] Add users management end points
-- [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
-- [ ] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
+- [ ] Writing basic integration tests with WebApplicationFactory
 - [ ] Add API Versioning
+  - [ ] Managing API Versions in Swagger
+  - [ ] https://medium.com/@celery_liu/asp-net-core-web-api-with-swagger-api-versioning-for-dotnet-8-c8ce2fd7808c
+- [ ] Generating a code coverage report
+- [ ] CI/CD for ASP.NET Core Using Azure Pipelines and GitHub Actions
+- [ ] Handling exceptions
+- [ ] Add get token endpoint for system user
+  - [ ] Implementing rate-limiting
+- [ ] Add users management end points
+  - [ ] Using model validation
+- [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
+- [ ] Configuring the Swagger UI to support authorization
+- [ ] Role-based authorization
+- [ ] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
 - [ ] Secure the DB connection string
 
 # AE Backend Code Challenge

@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using AEBackend.DTOs;
+using Asp.Versioning;
 
 namespace AEBackend.Controllers;
 
+[ApiVersion("1.0")]
 [ApiController]
-[Route("[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class UsersController : ControllerBase
 {
 
