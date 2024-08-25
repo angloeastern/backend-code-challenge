@@ -11,7 +11,7 @@
 # Learn about building .NET container images:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
 
-# Create a stage for building the application.
+#### TARGET: build
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 
 COPY . /source
@@ -22,15 +22,46 @@ WORKDIR /source
 # Placing it here allows the previous steps to be cached across architectures.
 ARG TARGETARCH
 
+RUN  dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+
 # Build the application.
 # Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
 # If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
 #   work in .NET 6.0.
+WORKDIR /source/AEBackend
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
+
+#### TARGET: test
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS test
+
+COPY --from=build / /
+
+WORKDIR /source
+
+ARG TARGETARCH
+
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
     dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false --property:PublishDir=app
 
 RUN dotnet test --logger "console;verbosity=detailed" /source/AEBackend.Tests
 
+#### TARGET: development
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development
+COPY --from=build /source /source
+
+WORKDIR /source/AEBackend
+
+# RUN dotnet add package Microsoft.EntityFrameworkCore.Design && \
+#     dotnet tool install --global dotnet-ef
+
+
+CMD dotnet run --no-launch-profile --project AEBackend.csproj
+
+
+#### TARGET: final
 # If you need to enable globalization and time zones:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/enable-globalization.md
 ################################################################################

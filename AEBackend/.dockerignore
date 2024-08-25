@@ -31,3 +31,7 @@
 LICENSE
 README.md
 **/db/password.txt
+
+**/AEBackend/app
+**/AEBackend/obj
+**/AEBackend/bin

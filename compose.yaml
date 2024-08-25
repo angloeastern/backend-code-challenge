@@ -11,7 +11,7 @@ services:
   server:
     build:
       context: .
-      target: final
+      target: development
     ports:
       - 8080:8080
       - 443:443
@@ -22,6 +22,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
     volumes:
       - ~/.aspnet/https:/https:ro
+      - .:/source
     # The commented out section below is an example of how to define a PostgreSQL
     # database that your application can use. `depends_on` tells Docker Compose to
     # start the database before your application. The `db-data` volume persists the
@@ -31,10 +32,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      pgadmin:
+        condition: service_started
     develop:
       watch:
-        - action: rebuild
+        - action: sync+restart
           path: .
+          target: /source
+          ignore:
+            - AEBackend/obj
+            - AEBackend/app
+            - AEBackend/bin
+    networks:
+      - dev
   db:
     image: postgres
     restart: always
@@ -47,14 +57,36 @@ services:
       - POSTGRES_DB=example
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
     expose:
-      - 5432
+      - 5432:5432
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      # test: ["CMD", "pg_isready"]
+      test: pg_isready -h localhost -U postgres
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 120
+    networks:
+      - dev
+  pgadmin:
+    container_name: container-pgadmin
+    image: dpage/pgadmin4
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    restart: unless-stopped
+    networks:
+      - dev
+
 volumes:
   db-data:
 secrets:
   db-password:
     file: AEBackend/db/password.txt
+
+networks:
+  dev:
+    driver: bridge
