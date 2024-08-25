@@ -1,8 +1,11 @@
 # TASKS
 
+- [ ] Add system user
+- [ ] Add users management end points
 - [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
 - [ ] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
-- [ ] as
+- [ ] Add API Versioning
+- [ ] Secure the DB connection string
 
 # AE Backend Code Challenge
 
