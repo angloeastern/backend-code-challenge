@@ -1,5 +1,8 @@
+using System.Net;
+using System.Threading.RateLimiting;
 using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -39,18 +42,28 @@ public class Program
         }
     }
 
-    public WebApplication CreateApp(string[] args)
+    private void SetupApiRateLimiter(WebApplicationBuilder builder)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddFixedWindowLimiter(policyName: "fixed", options =>
+                {
+                    options.PermitLimit = 2;
+                    options.Window = TimeSpan.FromSeconds(30);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 2;
 
-        builder.Services.AddControllers();
-        builder.Logging.AddConsole();
+                });
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = async (context, token) =>
+            {
+                await context.HttpContext.Response.WriteAsync("Too many requests. Please try again latter");
+            };
+        });
+    }
 
-        builder.Services.AddTransient<Seeder>();
-        builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-
-        builder.Services.AddTransient<IUserRepository, UserRepositoryUsingEF>();
-
+    private void SetupSwaggerAndApiVersioning(WebApplicationBuilder builder)
+    {
         builder.Services.AddApiVersioning(
             options =>
             {
@@ -62,28 +75,15 @@ public class Program
                 options.GroupNameFormat = "'v'VVV";
                 options.SubstituteApiVersionInUrl = true;
             });
+
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         // builder.Services.AddEndpointsApiExplorer().AddApiVersioning();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAll", builder =>
-            {
-                builder.AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin();
-            });
-        });
 
+    }
 
-        builder.Services.AddDbContext<UserDBContext>(options =>
-        {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-        });
-
-
-        var app = builder.Build();
-
+    private void SetupSwagger(WebApplication app)
+    {
 
         if (app.Environment.IsDevelopment())
         {
@@ -100,7 +100,56 @@ public class Program
 
 
         }
+    }
 
+    private void SetupDBContexts(WebApplicationBuilder builder)
+    {
+        builder.Services.AddDbContext<UserDBContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        });
+
+    }
+
+    private void SetupCORS(WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowAll", builder =>
+                    {
+                        builder.AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowAnyOrigin();
+                    });
+                });
+    }
+
+    private void SetupCustomServices(WebApplicationBuilder builder)
+    {
+        builder.Services.AddTransient<Seeder>();
+        builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        builder.Services.AddTransient<IUserRepository, UserRepositoryUsingEF>();
+    }
+
+    public WebApplication CreateApp(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddControllers();
+        builder.Logging.AddConsole();
+
+        SetupApiRateLimiter(builder);
+        SetupSwaggerAndApiVersioning(builder);
+        SetupDBContexts(builder);
+        SetupCORS(builder);
+        SetupCustomServices(builder);
+
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            SetupSwagger(app);
+        }
 
         app.UseHttpsRedirection();
 

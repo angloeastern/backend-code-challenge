@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using AEBackend.DTOs;
 using Asp.Versioning;
 using AEBackend.Repositories;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AEBackend.Controllers;
 
@@ -18,9 +19,12 @@ public class UsersController : ControllerBase
     _userRepository = userRepository;
   }
 
+  [EnableRateLimiting("fixed")]
   [HttpGet(Name = "Users")]
   public Task<List<User>> Get()
   {
     return _userRepository.GetAllUsers();
   }
+
+
 }
