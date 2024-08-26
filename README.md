@@ -1,15 +1,15 @@
 # TASKS
 
-- [ ] Add system user
-- [ ] Writing basic integration tests with WebApplicationFactory
-- [ ] Add API Versioning
-  - [ ] Managing API Versions in Swagger
+- [x] Add system user
+- [x] Writing basic integration tests with WebApplicationFactory
+- [x] Add API Versioning
+  - [x] Managing API Versions in Swagger
   - [x] https://medium.com/@celery_liu/asp-net-core-web-api-with-swagger-api-versioning-for-dotnet-8-c8ce2fd7808c
 - [ ] Generating a code coverage report
 - [ ] CI/CD for ASP.NET Core Using Azure Pipelines and GitHub Actions
 - [ ] Handling exceptions
 - [ ] Add get token endpoint for system user
-  - [ ] Implementing rate-limiting
+  - [x] Implementing rate-limiting
 - [ ] Add users management end points
   - [ ] Using model validation
 - [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
