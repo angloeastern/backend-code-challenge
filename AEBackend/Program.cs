@@ -1,10 +1,15 @@
 using System.Net;
+using System.Text;
 using System.Threading.RateLimiting;
+using AEBackend.DomainModels;
 using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AEBackend;
@@ -33,8 +38,6 @@ public class Program
         var services = scope.ServiceProvider;
 
         var context = services.GetRequiredService<UserDBContext>();
-
-        Console.WriteLine("Connection string:" + context.Database.GetConnectionString());
 
         if ((await context.Database.GetPendingMigrationsAsync()).Any())
         {
@@ -131,6 +134,47 @@ public class Program
         builder.Services.AddTransient<IUserRepository, UserRepositoryUsingEF>();
     }
 
+    private void SetupIdentityCore(WebApplicationBuilder builder)
+    {
+        builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<UserDBContext>()
+            .AddDefaultTokenProviders();
+
+        builder.Services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireDigit = false;
+            options.Password.RequireUppercase = false;
+        });
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            var secret = builder.Configuration["JwtConfig:Secret"];
+            var issuer = builder.Configuration["JwtConfig:ValidIssuer"];
+            var audience = builder.Configuration["JwtConfig:ValidAudiences"];
+            if (secret is null || issuer is null || audience is null)
+            {
+                throw new ApplicationException("Jwt is not set in the configuration");
+            }
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidAudience = audience,
+                ValidIssuer = issuer,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+            };
+        });
+
+    }
+
     public WebApplication CreateApp(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -143,6 +187,7 @@ public class Program
         SetupDBContexts(builder);
         SetupCORS(builder);
         SetupCustomServices(builder);
+        SetupIdentityCore(builder);
 
         var app = builder.Build();
 

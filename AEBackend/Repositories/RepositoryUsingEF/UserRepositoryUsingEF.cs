@@ -1,4 +1,4 @@
-using AEBackend;
+using AEBackend.DomainModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace AEBackend.Repositories.RepositoryUsingEF;
