@@ -37,16 +37,13 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 #### TARGET: test
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS test
 
-COPY --from=build / /
+COPY --from=build /source /source
 
-WORKDIR /source
+WORKDIR /source/AEBackend.Tests
 
 ARG TARGETARCH
 
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false --property:PublishDir=app
-
-RUN dotnet test --logger "console;verbosity=detailed" /source/AEBackend.Tests
+RUN dotnet test --logger "console;verbosity=detailed" 
 
 #### TARGET: development
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development

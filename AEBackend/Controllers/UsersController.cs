@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AEBackend.DTOs;
 using Asp.Versioning;
+using AEBackend.Repositories;
 
 namespace AEBackend.Controllers;
 
@@ -10,15 +11,16 @@ namespace AEBackend.Controllers;
 public class UsersController : ControllerBase
 {
 
+  private IUserRepository _userRepository;
 
-  public UsersController()
+  public UsersController(IUserRepository userRepository)
   {
-
+    _userRepository = userRepository;
   }
 
   [HttpGet(Name = "Users")]
-  public UserDTO[] Get()
+  public Task<List<User>> Get()
   {
-    return [new UserDTO() { ID = 1 }, new UserDTO() { ID = 2 }];
+    return _userRepository.GetAllUsers();
   }
 }

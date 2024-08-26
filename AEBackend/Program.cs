@@ -1,3 +1,4 @@
+using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -29,6 +30,9 @@ public class Program
         var services = scope.ServiceProvider;
 
         var context = services.GetRequiredService<UserDBContext>();
+
+        Console.WriteLine("Connection string:" + context.Database.GetConnectionString());
+
         if ((await context.Database.GetPendingMigrationsAsync()).Any())
         {
             await context.Database.MigrateAsync();
@@ -44,6 +48,8 @@ public class Program
 
         builder.Services.AddTransient<Seeder>();
         builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+        builder.Services.AddTransient<IUserRepository, UserRepositoryUsingEF>();
 
         builder.Services.AddApiVersioning(
             options =>
@@ -69,10 +75,12 @@ public class Program
             });
         });
 
+
         builder.Services.AddDbContext<UserDBContext>(options =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
+
 
         var app = builder.Build();
 
@@ -89,7 +97,10 @@ public class Program
                             options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                         }
                     });
+
+
         }
+
 
         app.UseHttpsRedirection();
 

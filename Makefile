@@ -15,6 +15,6 @@ recreate-server: destroy
 	docker compose up server --build -d
 
 test:
-	docker build -t dotnet-docker-image-test --progress=plain --no-cache --target test .
+	docker compose exec -w /source/AEBackend.Tests server  dotnet test --logger "console;verbosity=detailed"
 
 recreate-all: destroy destroy-image run
