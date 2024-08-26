@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using AEBackend.DomainModels;
 using AEBackend.DTOs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AEBackend.Controllers;
 
@@ -24,29 +25,31 @@ public class UsersController : ControllerBase
   }
 
   [EnableRateLimiting("fixed")]
+  // [Authorize(Roles = AppRoles.Administrator)]
   [HttpGet(Name = "Users")]
-  public Task<List<User>> Get()
+  public async Task<ApiResult<List<User>>> Get()
   {
-    return _userRepository.GetAllUsers();
+    var users = await _userRepository.GetAllUsers();
+    return ApiResult.Success(users);
   }
 
+
   [EnableRateLimiting("fixed")]
+  // [Authorize(Roles = AppRoles.Administrator)]
   [HttpPost(Name = "Register")]
-  public async Task<IActionResult> Create([FromBody] CreateUserRequest createUserRequest)
+  public async Task<ApiResult<User>> Create([FromBody] CreateUserRequest createUserRequest)
   {
     if (ModelState.IsValid)
     {
       var existingUser = await _userManager.FindByEmailAsync(createUserRequest.Email);
       if (existingUser != null)
       {
-        ModelState.AddModelError("Email", "Email already taken");
-        return BadRequest(ModelState);
+        return ApiResult.Failure<User>("Email already taken");
       }
 
       if (!AppRoles.IsRoleValid(createUserRequest.Role))
       {
-        ModelState.AddModelError("Role", "Role is not valid");
-        return BadRequest(ModelState);
+        return ApiResult.Failure<User>("Role is not valid");
       }
 
       var user = new User
@@ -62,17 +65,23 @@ public class UsersController : ControllerBase
 
       if (!createUserResult.Succeeded)
       {
-        ModelState.AddModelError("", String.Join(", ", createUserResult.Errors.Select(x => x.Description)));
-        return BadRequest(ModelState);
+        return ApiResult.Failure<User>(string.Join(", ", createUserResult.Errors.Select(x => x.Description)));
       }
 
       await _userManager.AddToRoleAsync(user, createUserRequest.Role);
 
-      return Ok();
+      return ApiResult.Success(user);
     }
     else
     {
-      return BadRequest(ModelState);
+      var er = ModelState.Values.Select(x => x.Errors.ToList()).ToList();
+
+      List<string> errorMessages = [];
+      er.ForEach(x => x.ForEach(y =>
+      {
+        errorMessages.Add(y.ErrorMessage);
+      }));
+      return ApiResult.Failure<User>(string.Join(", ", errorMessages));
     }
   }
 
