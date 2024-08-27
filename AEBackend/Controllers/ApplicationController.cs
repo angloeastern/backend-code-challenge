@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+[ApiController]
 public class ApplicationController : ControllerBase
 {
   protected List<string> GetModelStateErrors()

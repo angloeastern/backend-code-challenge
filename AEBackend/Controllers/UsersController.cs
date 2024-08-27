@@ -11,7 +11,6 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace AEBackend.Controllers;
 
 [ApiVersion("1.0")]
-[ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class UsersController : ApplicationController
 {
@@ -28,16 +27,48 @@ public class UsersController : ApplicationController
   }
 
 
-  [SwaggerOperation("Retrieve all users")]
+  [SwaggerOperation("See all users in the system")]
   [EnableRateLimiting("fixed")]
   [Authorize(AppRoles.AdministratorRole)]
-  [HttpGet(Name = "Users")]
+  [HttpGet]
   [Produces("application/json")]
   [ProducesResponseType(typeof(ApiResult<User>), StatusCodes.Status200OK)]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
 
   public async Task<ApiResult<List<User>>> Get()
+  {
+    try
+    {
+      var users = await _userRepository.GetAllUsers();
+
+      return ApiResult.Success(users);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<List<User>>(new ApiError(ex.ToString()));
+    }
+  }
+
+  [HttpGet("{id}/Ships")]
+  [SwaggerOperation("See ships assigned to a specific user")]
+  public async Task<ApiResult<List<User>>> GetShips()
+  {
+    try
+    {
+      var users = await _userRepository.GetAllUsers();
+
+      return ApiResult.Success(users);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<List<User>>(new ApiError(ex.ToString()));
+    }
+  }
+
+  [HttpPut("{id}/Ships")]
+  [SwaggerOperation("Update ships assigned to a user")]
+  public async Task<ApiResult<List<User>>> UpdateShips()
   {
     try
     {
@@ -93,10 +124,10 @@ public class UsersController : ApplicationController
   }
 
 
-  [SwaggerOperation("Register a new user")]
+  [SwaggerOperation("Add a user to the system")]
   [EnableRateLimiting("fixed")]
   [Authorize(AppRoles.AdministratorRole)]
-  [HttpPost(Name = "Register")]
+  [HttpPost]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]

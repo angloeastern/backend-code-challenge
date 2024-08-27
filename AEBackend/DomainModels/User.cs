@@ -7,6 +7,27 @@ namespace AEBackend.DomainModels;
 public class User : IdentityUser
 {
 
+  [JsonIgnore]
+  public override string PasswordHash { get; set; }
+
+  [JsonIgnore]
+  public override string NormalizedEmail { get; set; }
+
+  [JsonIgnore]
+  public override string NormalizedUserName { get; set; }
+
+  [JsonIgnore]
+  public override string SecurityStamp { get; set; }
+
+  [JsonIgnore]
+  public override string ConcurrencyStamp { get; set; }
+
+  [JsonIgnore]
+  public override bool LockoutEnabled { get; set; }
+
+  [JsonIgnore]
+  public override int AccessFailedCount { get; set; }
+
   [PersonalData]
   public string FirstName { get; set; } = string.Empty;
 
