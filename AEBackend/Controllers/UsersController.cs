@@ -30,7 +30,7 @@ public class UsersController : ApplicationController
 
   [SwaggerOperation("Retrieve all users")]
   [EnableRateLimiting("fixed")]
-  // [Authorize(Roles = AppRoles.Administrator)]
+  [Authorize(AppRoles.AdministratorRole)]
   [HttpGet(Name = "Users")]
   [Produces("application/json")]
   [ProducesResponseType(typeof(ApiResult<User>), StatusCodes.Status200OK)]
@@ -96,7 +96,7 @@ public class UsersController : ApplicationController
 
   [SwaggerOperation("Register a new user")]
   [EnableRateLimiting("fixed")]
-  [Authorize(Roles = AppRoles.AdministratorRole)]
+  [Authorize(AppRoles.AdministratorRole)]
   [HttpPost(Name = "Register")]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]

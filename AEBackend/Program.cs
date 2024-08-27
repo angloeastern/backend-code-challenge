@@ -85,7 +85,29 @@ public class Program
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         // builder.Services.AddEndpointsApiExplorer().AddApiVersioning();
-        builder.Services.AddSwaggerGen(c => c.EnableAnnotations());
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.EnableAnnotations();
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement{{
+                new OpenApiSecurityScheme{
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                new string[] { }
+            }});
+        });
+
 
     }
 
@@ -143,7 +165,12 @@ public class Program
     private void SetupIdentityCore(WebApplicationBuilder builder)
     {
         builder.Services.AddIdentityApiEndpoints<User>()
-            .AddEntityFrameworkStores<UserDBContext>();
+            .AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<UserDBContext>()
+            .AddDefaultTokenProviders();
+
+        // builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User, ApplicationRole>>();
+
 
         builder.Services.Configure<IdentityOptions>(options =>
         {
@@ -190,6 +217,13 @@ public class Program
         });
         builder.Logging.AddConsole();
 
+        // builder.Services.AddAuthorization(options =>
+        //  {
+        //      options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(AppRoles.AdministratorRole));
+        //      options.AddPolicy("RequireVipUserRole", policy => policy.RequireRole(AppRoles.VipUserRole));
+        //      options.AddPolicy("RequireUserRole", policy => policy.RequireRole(AppRoles.UserRole));
+        //      options.AddPolicy("RequireUserRoleOrVipUserRole", policy => policy.RequireRole(AppRoles.UserRole, AppRoles.VipUserRole));
+        //  });
         builder.Services.AddAuthorization();
 
         SetupApiRateLimiter(builder);
