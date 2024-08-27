@@ -163,6 +163,8 @@ dotnet dev-certs https --trust
 make
 ```
 
+Wait until the startup finished. The system will try to execute the database migrations and seeder.
+
 4. Call the API in
 
 ```
