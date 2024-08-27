@@ -8,8 +8,4 @@ public class LoginRequest
   [Required(ErrorMessage = "Password is required")]
   public string Password { get; set; } = String.Empty;
 
-  public string TwoFactorCode { get; set; } = String.Empty;
-
-  public string TwoFactorRecoveryCode { get; set; } = String.Empty;
-
 }

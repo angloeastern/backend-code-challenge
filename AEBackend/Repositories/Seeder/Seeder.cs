@@ -26,8 +26,8 @@ public class Seeder
         EmailConfirmed = true,
         FirstName = "Irwansyah",
         LastName = "Irwansyah",
-        UserName = "admin",
-        NormalizedUserName = "ADMIN",
+        UserName = "irwansyah@gmail.com",
+        NormalizedUserName = "IRWANSYAH@GMAIL.COM",
         NormalizedEmail = "IRWANSYAH@GMAIL.COM",
       };
 

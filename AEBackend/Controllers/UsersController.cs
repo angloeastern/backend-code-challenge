@@ -13,17 +13,20 @@ namespace AEBackend.Controllers;
 [ApiVersion("1.0")]
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController : ApplicationController
 {
 
   private IUserRepository _userRepository;
   private UserManager<User> _userManager;
+  private IConfiguration _configuration;
 
-  public UsersController(IUserRepository userRepository, UserManager<User> userManager)
+  public UsersController(IUserRepository userRepository, UserManager<User> userManager, IConfiguration configuration)
   {
     _userRepository = userRepository;
     _userManager = userManager;
+    _configuration = configuration;
   }
+
 
   [SwaggerOperation("Retrieve all users")]
   [EnableRateLimiting("fixed")]
@@ -36,19 +39,20 @@ public class UsersController : ControllerBase
 
   public async Task<ApiResult<List<User>>> Get()
   {
-    var users = await _userRepository.GetAllUsers();
+    try
+    {
+      var users = await _userRepository.GetAllUsers();
 
-    return ApiResult.Success(users);
+      return ApiResult.Success(users);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<List<User>>(new ApiError(ex.ToString()));
+    }
   }
 
-  [SwaggerOperation("Register a new user")]
-  [EnableRateLimiting("fixed")]
-  // [Authorize(Roles = AppRoles.Administrator)]
-  [HttpPost(Name = "Register")]
-  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
-  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
-  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
-  public async Task<ApiResult<User>> Create([FromBody] CreateUserRequest createUserRequest)
+
+  private async Task<ApiResult<User>> CreateUser([FromBody] CreateUserRequest createUserRequest)
   {
     if (ModelState.IsValid)
     {
@@ -85,16 +89,32 @@ public class UsersController : ControllerBase
     }
     else
     {
-      var er = ModelState.Values.Select(x => x.Errors.ToList()).ToList();
-
-      List<string> errorMessages = [];
-      er.ForEach(x => x.ForEach(y =>
-      {
-        errorMessages.Add(y.ErrorMessage);
-      }));
-      return ApiResult.Failure<User>(string.Join(", ", errorMessages));
+      return ApiResult.Failure<User>(string.Join(", ", GetModelStateErrors()));
     }
   }
+
+
+  [SwaggerOperation("Register a new user")]
+  [EnableRateLimiting("fixed")]
+  [Authorize(Roles = AppRoles.AdministratorRole)]
+  [HttpPost(Name = "Register")]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+  public async Task<ApiResult<User>> Create([FromBody] CreateUserRequest createUserRequest)
+  {
+    try
+    {
+      return await CreateUser(createUserRequest);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<User>(new ApiError(ex.ToString()));
+    }
+
+  }
+
+
 
 
 }
