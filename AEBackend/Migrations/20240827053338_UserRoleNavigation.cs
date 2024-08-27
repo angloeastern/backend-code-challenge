@@ -5,22 +5,24 @@
 namespace AEBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFirstNameAndLastNameToUser : Migration
+    public partial class UserRoleNavigation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "FirstName",
-                table: "AspNetUsers",
-                type: "text",
+                name: "Discriminator",
+                table: "AspNetUserRoles",
+                type: "character varying(34)",
+                maxLength: 34,
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
-                name: "LastName",
-                table: "AspNetUsers",
-                type: "text",
+                name: "Discriminator",
+                table: "AspNetRoles",
+                type: "character varying(21)",
+                maxLength: 21,
                 nullable: false,
                 defaultValue: "");
         }
@@ -29,12 +31,12 @@ namespace AEBackend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "FirstName",
-                table: "AspNetUsers");
+                name: "Discriminator",
+                table: "AspNetUserRoles");
 
             migrationBuilder.DropColumn(
-                name: "LastName",
-                table: "AspNetUsers");
+                name: "Discriminator",
+                table: "AspNetRoles");
         }
     }
 }

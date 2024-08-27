@@ -1,14 +1,18 @@
+using System.Text.Json;
 using AEBackend.DomainModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AEBackend.Repositories.RepositoryUsingEF;
 public class UserRepositoryUsingEF : IUserRepository
 {
   private readonly UserDBContext _userDBContext;
+  private readonly ILogger _logger;
 
-  public UserRepositoryUsingEF(UserDBContext userDBContext)
+  public UserRepositoryUsingEF(UserDBContext userDBContext, ILogger<UserRepositoryUsingEF> logger)
   {
     _userDBContext = userDBContext;
+    _logger = logger;
   }
   public async Task CreateUser(User user)
   {
@@ -18,8 +22,20 @@ public class UserRepositoryUsingEF : IUserRepository
 
   public async Task<List<User>> GetAllUsers()
   {
-    var allUsers = await _userDBContext.Users.ToListAsync();
+    _logger.LogDebug("Calling _userDBContext.Users.Include...");
+    try
+    {
+      var allUsers = await _userDBContext.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
 
-    return allUsers;
+      _logger.LogDebug("Calling _userDBContext.Users.Include...[DONE] {0}", JsonSerializer.Serialize(allUsers));
+
+      return allUsers;
+
+    }
+    catch (System.Exception ex)
+    {
+      _logger.LogError(ex.ToString());
+      throw;
+    }
   }
 }

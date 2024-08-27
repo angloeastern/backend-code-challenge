@@ -47,12 +47,15 @@ RUN dotnet test --logger "console;verbosity=detailed"
 
 #### TARGET: development
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development
-COPY --from=build /source /source
+
+RUN  dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
 
 WORKDIR /source/AEBackend
 
-# RUN dotnet add package Microsoft.EntityFrameworkCore.Design && \
-#     dotnet tool install --global dotnet-ef
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
+
 
 
 CMD dotnet run --no-launch-profile --project AEBackend.csproj

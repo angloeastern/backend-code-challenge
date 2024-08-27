@@ -2,6 +2,8 @@ using System.Net;
 using System.Text;
 using System.Threading.RateLimiting;
 using AEBackend.DomainModels;
+using AEBackend.Extensions;
+using AEBackend.Middlewares;
 using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace AEBackend;
@@ -67,6 +70,7 @@ public class Program
 
     private void SetupSwaggerAndApiVersioning(WebApplicationBuilder builder)
     {
+        builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddApiVersioning(
             options =>
             {
@@ -81,7 +85,7 @@ public class Program
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         // builder.Services.AddEndpointsApiExplorer().AddApiVersioning();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c => c.EnableAnnotations());
 
     }
 
@@ -112,6 +116,8 @@ public class Program
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+
+
     }
 
     private void SetupCORS(WebApplicationBuilder builder)
@@ -136,9 +142,8 @@ public class Program
 
     private void SetupIdentityCore(WebApplicationBuilder builder)
     {
-        builder.Services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<UserDBContext>()
-            .AddDefaultTokenProviders();
+        builder.Services.AddIdentityApiEndpoints<User>()
+            .AddEntityFrameworkStores<UserDBContext>();
 
         builder.Services.Configure<IdentityOptions>(options =>
         {
@@ -185,6 +190,8 @@ public class Program
         });
         builder.Logging.AddConsole();
 
+        builder.Services.AddAuthorization();
+
         SetupApiRateLimiter(builder);
         SetupSwaggerAndApiVersioning(builder);
         SetupDBContexts(builder);
@@ -197,13 +204,14 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             SetupSwagger(app);
+            app.UseExceptionHandler("/error");
         }
 
         app.UseHttpsRedirection();
-
         app.UseAuthorization();
 
         app.MapControllers();
+        app.UseExceptionHandlerMiddleware();
 
         return app;
     }

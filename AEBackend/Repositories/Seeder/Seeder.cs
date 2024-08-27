@@ -16,17 +16,8 @@ public class Seeder
     if (!_userDBContext.Users.Any())
     {
       string ADMIN_ID = "203557e0-b2f4-449c-9671-e69fe5ee6d86";
-      string ROLE_ID = "4b390270-3075-4a64-814a-6f7223e921b1";
 
-      IdentityRole adminRole = new()
-      {
-        Name = AppRoles.Administrator,
-        NormalizedName = "ADMIN",
-        Id = ROLE_ID,
-        ConcurrencyStamp = ROLE_ID
-      };
-
-      await _userDBContext.Roles.AddAsync(adminRole);
+      await _userDBContext.Roles.AddAsync(AppRoles.Administrator);
 
       User adminUser = new()
       {
@@ -45,9 +36,9 @@ public class Seeder
       await _userDBContext.Users.AddAsync(adminUser);
 
 
-      IdentityUserRole<string> identityUserRole = new()
+      ApplicationUserRole identityUserRole = new()
       {
-        RoleId = ROLE_ID,
+        RoleId = AppRoles.Administrator.Id,
         UserId = ADMIN_ID
       };
 
@@ -58,29 +49,17 @@ public class Seeder
 
   private async Task SeedUserRoles()
   {
-    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.Administrator))
+    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.Administrator.Name))
     {
-      await _userDBContext.Roles.AddAsync(new IdentityRole
-      {
-        Name = AppRoles.Administrator,
-        NormalizedName = AppRoles.Administrator.ToUpper()
-      });
+      await _userDBContext.Roles.AddAsync(AppRoles.Administrator);
     }
-    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.User))
+    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.User.Name))
     {
-      await _userDBContext.Roles.AddAsync(new IdentityRole
-      {
-        Name = AppRoles.User,
-        NormalizedName = AppRoles.User.ToUpper()
-      });
+      await _userDBContext.Roles.AddAsync(AppRoles.User);
     }
-    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.VipUser))
+    if (!_userDBContext.Roles.Any(x => x.Name == AppRoles.VipUser.Name))
     {
-      await _userDBContext.Roles.AddAsync(new IdentityRole
-      {
-        Name = AppRoles.VipUser,
-        NormalizedName = AppRoles.VipUser
-      });
+      await _userDBContext.Roles.AddAsync(AppRoles.VipUser);
     }
 
     await _userDBContext.SaveChangesAsync();

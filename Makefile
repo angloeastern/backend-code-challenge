@@ -14,6 +14,9 @@ destroy-image: destroy
 recreate-server: destroy
 	docker compose up server --build -d
 
+rr:
+	docker compose restart server
+
 test:
 	docker compose exec -w /source/AEBackend.Tests server  dotnet test --logger "console;verbosity=detailed"
 

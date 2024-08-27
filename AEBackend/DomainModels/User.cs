@@ -1,15 +1,26 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
 namespace AEBackend.DomainModels;
 
 public class User : IdentityUser
 {
-  [Required(ErrorMessage = "First name is required")]
-  public required string FirstName { get; set; }
 
-  [Required(ErrorMessage = "Last name is required")]
-  public required string LastName { get; set; }
+  [PersonalData]
+  public string FirstName { get; set; } = string.Empty;
 
+  [PersonalData]
+  public string LastName { get; set; } = string.Empty;
+
+  [JsonIgnore]
+  public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }
+
+  [JsonIgnore]
+  public virtual ICollection<IdentityUserLogin<string>> Logins { get; set; }
+
+  [JsonIgnore]
+  public virtual ICollection<IdentityUserToken<string>> Tokens { get; set; }
+  public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
 
 }

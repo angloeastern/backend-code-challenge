@@ -22,9 +22,9 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
   {
     var info = new OpenApiInfo
     {
-      Title = "API Title",
+      Title = "AE Backend",
       Version = description.ApiVersion.ToString(),
-      Description = "API Description. This API version has been deprecated."
+      Description = "API for AE Backend"
     };
     return info;
   }

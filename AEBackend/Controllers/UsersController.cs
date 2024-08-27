@@ -6,6 +6,7 @@ using AEBackend.DomainModels;
 using AEBackend.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace AEBackend.Controllers;
 
@@ -24,19 +25,29 @@ public class UsersController : ControllerBase
     _userManager = userManager;
   }
 
+  [SwaggerOperation("Retrieve all users")]
   [EnableRateLimiting("fixed")]
   // [Authorize(Roles = AppRoles.Administrator)]
   [HttpGet(Name = "Users")]
+  [Produces("application/json")]
+  [ProducesResponseType(typeof(ApiResult<User>), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
+
   public async Task<ApiResult<List<User>>> Get()
   {
     var users = await _userRepository.GetAllUsers();
+
     return ApiResult.Success(users);
   }
 
-
+  [SwaggerOperation("Register a new user")]
   [EnableRateLimiting("fixed")]
   // [Authorize(Roles = AppRoles.Administrator)]
   [HttpPost(Name = "Register")]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(typeof(ApiResult), StatusCodes.Status500InternalServerError)]
   public async Task<ApiResult<User>> Create([FromBody] CreateUserRequest createUserRequest)
   {
     if (ModelState.IsValid)
