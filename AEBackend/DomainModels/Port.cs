@@ -1,3 +1,5 @@
+using NetTopologySuite.Geometries;
+
 public class Port
 {
   public string Name { get; set; } = string.Empty;
@@ -7,4 +9,6 @@ public class Port
 
   public double Lat { get; set; } = 0;
   public double Long { get; set; } = 0;
+
+  public Point? Location { get; set; }
 }

@@ -2,6 +2,8 @@ using AEBackend.DomainModels;
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualBasic;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Utilities;
 
 
 namespace AEBackend.Repositories.Seeder;
@@ -80,14 +82,17 @@ public class Seeder
       var ports = PortsJsonLoader.LoadJson(_logger)!.Select(x =>
             {
               string id = x.unlocs![0];
+              double lat = x.coordinates![0];
+              double longi = x.coordinates![0];
 
               var port = new Port
               {
                 Id = id,
                 City = x.city!,
                 Country = x.country!,
-                Lat = x.coordinates![0],
-                Long = x.coordinates![1],
+                Lat = lat,
+                Long = longi,
+                Location = new NetTopologySuite.Geometries.Point(new Coordinate(longi, lat)),
                 Name = x.name!
               };
               return port;
@@ -102,7 +107,6 @@ public class Seeder
 
       _logger.LogDebug("Saving Ports to DB...");
       await _appDBContext.SaveChangesAsync();
-
     }
   }
 

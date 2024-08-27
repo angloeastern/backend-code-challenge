@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -12,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AEBackend.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20240827114559_AddPort")]
-    partial class AddPort
+    [Migration("20240827124336_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -263,6 +264,9 @@ namespace AEBackend.Migrations
 
                     b.Property<double>("Lat")
                         .HasColumnType("double precision");
+
+                    b.Property<Point>("Location")
+                        .HasColumnType("geometry");
 
                     b.Property<double>("Long")
                         .HasColumnType("double precision");
