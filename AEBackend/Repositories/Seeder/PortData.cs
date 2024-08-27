@@ -36,7 +36,6 @@ public class PortsJsonLoader
           if (!addedPortIds.ContainsKey(id))
           {
 
-            logger.LogDebug("Adding item:" + item.Value.name);
             result.Add(item.Value);
             addedPortIds[id] = true;
           }
