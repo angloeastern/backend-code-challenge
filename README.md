@@ -165,12 +165,6 @@ make
 
 Wait until the startup finished. The system will try to execute the database migrations and seeder.
 
-4. Call the API in
-
-```
-https://localhost/
-```
-
 ## View Swagger
 
 Make sure you have followed the steps on `How to Run` properly. Open
