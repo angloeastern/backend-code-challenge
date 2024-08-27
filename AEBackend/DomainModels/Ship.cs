@@ -4,9 +4,13 @@ using NetTopologySuite.Geometries;
 namespace AEBackend.DomainModels;
 public class Ship
 {
+  public string Id { get; set; }
+  public string Name { get; set; }
   public Knot Velocity { get; set; } = Knot.Zero();
   public double Lat { get; set; } = 0;
   public double Long { get; set; } = 0;
+
+  public ICollection<UserShip> UserShips { get; set; }
 
   public TimeSpan EstimatedArrivalTimeTo(Port port)
   {
@@ -18,4 +22,5 @@ public class Ship
 
     return arrivalTime;
   }
+
 }

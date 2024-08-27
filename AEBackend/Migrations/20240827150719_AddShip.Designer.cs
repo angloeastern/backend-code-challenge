@@ -3,6 +3,7 @@ using System;
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AEBackend.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240827150719_AddShip")]
+    partial class AddShip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -337,13 +340,6 @@ namespace AEBackend.Migrations
                         {
                             b1.Property<string>("ShipId")
                                 .HasColumnType("text");
-
-                            b1.Property<string>("UnitName")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<double>("Value")
-                                .HasColumnType("double precision");
 
                             b1.HasKey("ShipId");
 

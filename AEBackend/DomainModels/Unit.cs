@@ -2,28 +2,15 @@ namespace AEBackend.DomainModels;
 
 public class Quantity
 {
-  private string _unitName;
-  private double _value;
+  public Quantity() { }
 
   public Quantity(string unitName, double value)
   {
-    _unitName = unitName;
-    _value = value;
+    UnitName = unitName;
+    Value = value;
   }
 
-  public string UnitName
-  {
-    get
-    {
-      return _unitName;
-    }
-  }
-  public double Value
-  {
-    get
-    {
-      return _value;
-    }
-  }
+  public string UnitName { get; set; }
+  public double Value { get; set; }
 
 }

@@ -44,4 +44,6 @@ public class User : IdentityUser
   public virtual ICollection<IdentityUserToken<string>>? Tokens { get; set; }
   public virtual ICollection<ApplicationUserRole>? UserRoles { get; set; }
 
+  public virtual ICollection<UserShip>? UserShips { get; set; }
+
 }

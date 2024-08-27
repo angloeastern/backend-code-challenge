@@ -13,6 +13,7 @@ namespace AEBackend.Repositories.RepositoryUsingEF
     {
       base.OnModelCreating(modelBuilder);
 
+
       modelBuilder.Entity<User>(b =>
       {
         // Each User can have many UserClaims
@@ -38,6 +39,21 @@ namespace AEBackend.Repositories.RepositoryUsingEF
               .WithOne(e => e.User)
               .HasForeignKey(ur => ur.UserId)
               .IsRequired();
+
+        b.HasMany(e => e.UserShips)
+              .WithOne(e => e.User)
+              .HasForeignKey(ur => ur.UserId)
+              .IsRequired();
+
+      });
+
+      modelBuilder.Entity<Ship>(s =>
+      {
+        s.HasMany(e => e.UserShips)
+          .WithOne(e => e.Ship)
+          .HasForeignKey(ur => ur.ShipId);
+
+        s.OwnsOne(x => x.Velocity);
       });
 
       modelBuilder.Entity<ApplicationRole>(b =>
