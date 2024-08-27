@@ -4,6 +4,7 @@ using System.Text;
 using AEBackend.Controllers;
 using AEBackend.DomainModels;
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -29,6 +30,7 @@ public class LoginController : ApplicationController
 
 
   [SwaggerOperation("Logging in a user and retrieve the token to call the API")]
+  [AllowAnonymous]
   [EnableRateLimiting("fixed")]
   [HttpPost(Name = "Login")]
   [ProducesResponseType(typeof(ApiResult), StatusCodes.Status200OK)]
