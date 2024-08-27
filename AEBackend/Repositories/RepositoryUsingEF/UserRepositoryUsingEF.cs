@@ -18,7 +18,6 @@ public class UserRepositoryUsingEF : IUserRepository
   {
 
     await _AppDBContext.Users.AddAsync(user);
-    // await _AppDBContext.SaveChangesAsync();
 
     var role = AppRoles.Get(user.UserRoles!.First()!.Role!.Name!)!;
 
