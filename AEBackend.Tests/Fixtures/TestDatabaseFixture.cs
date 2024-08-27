@@ -20,7 +20,7 @@ public class TestDatabaseFixture : IAsyncLifetime
     {
       if (!_databaseInitialized)
       {
-        using (var context = CreateUserDBContext())
+        using (var context = CreateAppDBContext())
         {
           context.Database.EnsureDeleted();
           context.Database.EnsureCreated();
@@ -42,8 +42,8 @@ public class TestDatabaseFixture : IAsyncLifetime
   {
     await _postgreSqlContainer.StopAsync();
   }
-  public UserDBContext CreateUserDBContext()
+  public AppDBContext CreateAppDBContext()
   {
-    return new UserDBContext(new DbContextOptionsBuilder<UserDBContext>().UseNpgsql(_postgreSqlContainer.GetConnectionString()).Options);
+    return new AppDBContext(new DbContextOptionsBuilder<AppDBContext>().UseNpgsql(_postgreSqlContainer.GetConnectionString()).Options);
   }
 }

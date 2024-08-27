@@ -28,7 +28,7 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     if (user != null && _roles.Any())
     {
       var db = context.HttpContext.RequestServices
-          .GetService<UserDBContext>();
+          .GetService<AppDBContext>();
 
 
       var userRoles = (from ur in db.UserRoles

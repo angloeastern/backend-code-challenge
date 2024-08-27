@@ -27,7 +27,7 @@ public class TestApiFixture : WebApplicationFactory<Program>
     {
       var dbContextDescriptor = services.SingleOrDefault(
       d => d.ServiceType ==
-          typeof(DbContextOptions<UserDBContext>));
+          typeof(DbContextOptions<AppDBContext>));
 
       services.Remove(dbContextDescriptor!);
 
@@ -46,10 +46,10 @@ public class TestApiFixture : WebApplicationFactory<Program>
         return connection;
       });
 
-      services.AddDbContext<UserDBContext>((container, options) =>
+      services.AddDbContext<AppDBContext>((container, options) =>
       {
         var connection = container.GetRequiredService<DbConnection>();
-        options.UseSqlite(connection);
+        options.UseSqlite(x => x.UseNetTopologySuite());
       });
 
     });

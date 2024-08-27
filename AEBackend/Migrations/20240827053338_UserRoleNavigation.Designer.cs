@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AEBackend.Migrations
 {
-    [DbContext(typeof(UserDBContext))]
+    [DbContext(typeof(AppDBContext))]
     [Migration("20240827053338_UserRoleNavigation")]
     partial class UserRoleNavigation
     {

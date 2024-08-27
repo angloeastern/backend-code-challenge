@@ -20,4 +20,5 @@ rr:
 test:
 	docker compose exec -w /source/AEBackend.Tests server  dotnet test --logger "console;verbosity=detailed"
 
+
 recreate-all: destroy destroy-image run

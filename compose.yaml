@@ -67,7 +67,7 @@ services:
     networks:
       - dev
   db:
-    image: postgres
+    image: postgis/postgis:12-3.4
     restart: always
     user: postgres
     secrets:

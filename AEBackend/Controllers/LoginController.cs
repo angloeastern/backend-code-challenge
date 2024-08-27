@@ -54,8 +54,8 @@ public class LoginController : ApplicationController
           return ApiResult.Failure<string>("Invalid user name or password");
         }
 
-        var token = GenerateToken(user.UserName);
-        return ApiResult.Success<string>(token);
+        var token = GenerateToken(user.UserName!);
+        return ApiResult.Success<string>(token!);
       }
       else
       {

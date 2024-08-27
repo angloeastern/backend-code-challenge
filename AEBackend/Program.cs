@@ -1,11 +1,13 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.RateLimiting;
 using AEBackend.DomainModels;
 using AEBackend.Extensions;
 using AEBackend.Middlewares;
 using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
+using AEBackend.Repositories.Seeder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -40,7 +42,7 @@ public class Program
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
 
-        var context = services.GetRequiredService<UserDBContext>();
+        var context = services.GetRequiredService<AppDBContext>();
 
         if ((await context.Database.GetPendingMigrationsAsync()).Any())
         {
@@ -133,9 +135,9 @@ public class Program
 
     private void SetupDBContexts(WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext<UserDBContext>(options =>
+        builder.Services.AddDbContext<AppDBContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), x => x.UseNetTopologySuite());
         });
 
 
@@ -166,7 +168,7 @@ public class Program
     {
         builder.Services.AddIdentityApiEndpoints<User>()
             .AddRoles<ApplicationRole>()
-            .AddEntityFrameworkStores<UserDBContext>()
+            .AddEntityFrameworkStores<AppDBContext>()
             .AddDefaultTokenProviders();
 
         // builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User, ApplicationRole>>();
@@ -252,10 +254,13 @@ public class Program
     public async Task Run(string[] args)
     {
 
-        var app = CreateApp(args);
 
+        var app = CreateApp(args);
         await ApplyMigrations(app);
         await SeedData(app);
+
+
+
         app.Run();
     }
 

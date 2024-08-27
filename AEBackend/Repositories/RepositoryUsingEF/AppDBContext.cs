@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AEBackend.Repositories.RepositoryUsingEF
 {
-  public class UserDBContext(DbContextOptions options) : IdentityDbContext<User>(options)
+  public class AppDBContext(DbContextOptions options) : IdentityDbContext<User>(options)
   {
+    public DbSet<Port> Ports { get; internal set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       base.OnModelCreating(modelBuilder);
