@@ -25,6 +25,27 @@ public static class AppRoles
     NormalizedName = "VIPUSER"
   };
 
+
+  public static ApplicationRole? Get(string role)
+  {
+
+    var lowerRole = role.ToLower();
+    if (lowerRole.Equals(Administrator.Name, StringComparison.CurrentCultureIgnoreCase))
+    {
+      return Administrator;
+    }
+    if (lowerRole.Equals(User.Name, StringComparison.CurrentCultureIgnoreCase))
+    {
+      return User;
+    }
+    if (lowerRole.Equals(VipUser.Name, StringComparison.CurrentCultureIgnoreCase))
+    {
+      return VipUser;
+    }
+
+    return null;
+
+  }
   public static bool IsRoleValid(string role)
   {
     var lowerRole = role.ToLower();

@@ -73,17 +73,16 @@ public class UsersController : ApplicationController
         LastName = createUserRequest.LastName,
         Email = createUserRequest.Email,
         UserName = createUserRequest.Email,
-        SecurityStamp = Guid.NewGuid().ToString()
+        SecurityStamp = Guid.NewGuid().ToString(),
+        NormalizedUserName = createUserRequest.Email.ToUpper(),
+        NormalizedEmail = createUserRequest.Email.ToUpper(),
+        UserRoles = [new ApplicationUserRole() { Role = new ApplicationRole { Name = createUserRequest.Role } }]
       };
 
-      var createUserResult = await _userManager.CreateAsync(user, createUserRequest.Password);
+      PasswordHasher<User> ph = new();
+      user.PasswordHash = ph.HashPassword(user, createUserRequest.Password);
 
-      if (!createUserResult.Succeeded)
-      {
-        return ApiResult.Failure<User>(string.Join(", ", createUserResult.Errors.Select(x => x.Description)));
-      }
-
-      await _userManager.AddToRoleAsync(user, createUserRequest.Role);
+      await _userRepository.CreateUser(user);
 
       return ApiResult.Success(user);
     }

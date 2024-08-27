@@ -16,7 +16,19 @@ public class UserRepositoryUsingEF : IUserRepository
   }
   public async Task CreateUser(User user)
   {
+
     await _userDBContext.Users.AddAsync(user);
+    // await _userDBContext.SaveChangesAsync();
+
+    var role = AppRoles.Get(user.UserRoles.First()!.Role.Name!)!;
+
+    ApplicationUserRole identityUserRole = new()
+    {
+      RoleId = role.Id,
+      UserId = user.Id
+    };
+
+    await _userDBContext.UserRoles.AddAsync(identityUserRole);
     await _userDBContext.SaveChangesAsync();
   }
 
