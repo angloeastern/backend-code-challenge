@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
+namespace AEBackend.Controllers.Utils;
+
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class AuthorizeAttribute : Attribute, IAuthorizationFilter
 {
@@ -31,10 +33,10 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
           .GetService<AppDBContext>();
 
 
-      var userRoles = (from ur in db.UserRoles
+      var userRoles = (from ur in db!.UserRoles
                        join r in db.Roles on ur.RoleId equals r.Id
                        join u in db.Users on ur.UserId equals u.Id
-                       where u.UserName == user.Identity.Name
+                       where u.UserName == user.Identity!.Name
                        select new
                        {
                          r.Name

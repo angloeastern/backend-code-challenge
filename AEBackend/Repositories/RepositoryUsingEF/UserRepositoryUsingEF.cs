@@ -20,7 +20,7 @@ public class UserRepositoryUsingEF : IUserRepository
     await _AppDBContext.Users.AddAsync(user);
     // await _AppDBContext.SaveChangesAsync();
 
-    var role = AppRoles.Get(user.UserRoles.First()!.Role.Name!)!;
+    var role = AppRoles.Get(user.UserRoles!.First()!.Role!.Name!)!;
 
     ApplicationUserRole identityUserRole = new()
     {
@@ -37,7 +37,7 @@ public class UserRepositoryUsingEF : IUserRepository
     _logger.LogDebug("Calling _AppDBContext.Users.Include...");
     try
     {
-      var allUsers = await _AppDBContext.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
+      var allUsers = await _AppDBContext.Users.Include(u => u.UserRoles)!.ThenInclude(ur => ur.Role).ToListAsync();
 
       _logger.LogDebug("Calling _AppDBContext.Users.Include...[DONE] {0}", JsonSerializer.Serialize(allUsers));
 

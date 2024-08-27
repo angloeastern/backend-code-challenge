@@ -24,7 +24,7 @@ public class PortsJsonLoader
     using (StreamReader r = new StreamReader("Repositories/Seeder/ports.json"))
     {
       string json = r.ReadToEnd();
-      Dictionary<string, PortData> items = JsonSerializer.Deserialize<Dictionary<string, PortData>>(json);
+      Dictionary<string, PortData> items = JsonSerializer.Deserialize<Dictionary<string, PortData>>(json)!;
 
       List<PortData> result = [];
       Dictionary<string, bool> addedPortIds = new Dictionary<string, bool>();

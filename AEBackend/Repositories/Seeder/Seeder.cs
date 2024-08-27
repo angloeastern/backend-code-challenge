@@ -121,7 +121,7 @@ public class Seeder
 
 
 
-      var closestPort = _appDBContext.Ports.OrderBy(p => p.Location.Distance(currentLocation)).FirstOrDefault();
+      var closestPort = _appDBContext.Ports.OrderBy(p => p.Location!.Distance(currentLocation)).FirstOrDefault();
 
       if (closestPort != null)
       {

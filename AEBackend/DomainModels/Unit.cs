@@ -10,7 +10,7 @@ public class Quantity
     Value = value;
   }
 
-  public string UnitName { get; set; }
-  public double Value { get; set; }
+  public string UnitName { get; set; } = string.Empty;
+  public double Value { get; set; } = 0;
 
 }

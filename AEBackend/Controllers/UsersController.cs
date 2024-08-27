@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using AEBackend.DomainModels;
 using AEBackend.DTOs;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 using Swashbuckle.AspNetCore.Annotations;
+using AEBackend.Controllers.Utils;
 
 namespace AEBackend.Controllers;
 

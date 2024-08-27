@@ -68,6 +68,6 @@ public class Port
   }
   public Meter GetDistance(Point anotherPoint)
   {
-    return new Meter(GetDistanceInKM(this.Location.X, anotherPoint.X, this.Location.Y, anotherPoint.Y) * 1000);
+    return new Meter(GetDistanceInKM(this.Location!.X, anotherPoint.X, this.Location.Y, anotherPoint.Y) * 1000);
   }
 }

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+namespace AEBackend.Controllers.Utils;
+
 [ApiController]
 public class ApplicationController : ControllerBase
 {

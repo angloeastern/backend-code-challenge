@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.RateLimiting;
 using AEBackend.DomainModels;
 using AEBackend.Extensions;
-using AEBackend.Middlewares;
 using AEBackend.Repositories;
 using AEBackend.Repositories.RepositoryUsingEF;
 using AEBackend.Repositories.Seeder;

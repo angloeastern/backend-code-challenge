@@ -1,4 +1,4 @@
-namespace AEBackend.Controllers;
+namespace AEBackend.Controllers.Utils;
 public class ApiResult
 {
   public ApiResult(bool isSuccess, ApiError error)

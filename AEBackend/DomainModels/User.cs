@@ -8,19 +8,19 @@ public class User : IdentityUser
 {
 
   [JsonIgnore]
-  public override string PasswordHash { get; set; }
+  public override string? PasswordHash { get; set; }
 
   [JsonIgnore]
-  public override string NormalizedEmail { get; set; }
+  public override string? NormalizedEmail { get; set; }
 
   [JsonIgnore]
-  public override string NormalizedUserName { get; set; }
+  public override string? NormalizedUserName { get; set; }
 
   [JsonIgnore]
-  public override string SecurityStamp { get; set; }
+  public override string? SecurityStamp { get; set; }
 
   [JsonIgnore]
-  public override string ConcurrencyStamp { get; set; }
+  public override string? ConcurrencyStamp { get; set; }
 
   [JsonIgnore]
   public override bool LockoutEnabled { get; set; }

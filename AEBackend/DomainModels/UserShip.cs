@@ -8,9 +8,9 @@ namespace AEBackend.DomainModels;
 [PrimaryKey(nameof(UserId), nameof(ShipId))]
 public class UserShip
 {
-  public string UserId { get; set; }
+  public string? UserId { get; set; }
 
-  public string ShipId { get; set; }
+  public string? ShipId { get; set; }
 
   [JsonIgnore]
   public virtual User? User { get; set; }
