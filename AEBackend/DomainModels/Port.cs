@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using NetTopologySuite.Geometries;
 
 namespace AEBackend.DomainModels;
@@ -12,6 +13,7 @@ public class Port
   public double Lat { get; set; } = 0;
   public double Long { get; set; } = 0;
 
+  [JsonIgnore]
   public Point? Location { get; set; }
 
   private double toRadians(double angleIn10thofaDegree)

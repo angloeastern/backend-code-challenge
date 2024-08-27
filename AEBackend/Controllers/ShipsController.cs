@@ -39,7 +39,7 @@ public class ShipsController : ApplicationController
 
   [HttpGet("NearestPort")]
   [SwaggerOperation("See the nearest port to a ship with estimated arrival time to the port together with relevant details")]
-  public Task<ApiResult<List<User>>> GetNearest()
+  public Task<ApiResult<NearestPortInfo>> GetNearest()
   {
     throw new Exception();
   }
