@@ -7,8 +7,8 @@ public class ApiResult
     Error = error;
   }
 
-  public bool IsSuccess { get; }
-  public ApiError Error { get; }
+  public bool IsSuccess { get; set; }
+  public ApiError Error { get; set; }
 
   public static ApiResult Success() => new(true, ApiError.None);
 
@@ -21,7 +21,7 @@ public class ApiResult
 
 public class ApiResult<T> : ApiResult
 {
-  public T? Data { get; }
+  public T? Data { get; set; }
 
   public ApiResult(bool isSuccess, ApiError error, T? data) : base(isSuccess, error)
   {

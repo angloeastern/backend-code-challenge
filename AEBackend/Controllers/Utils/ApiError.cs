@@ -7,7 +7,7 @@ public class ApiError
     Message = message;
   }
 
-  public string Message { get; }
+  public string Message { get; set; }
 
   public static ApiError None => new(string.Empty);
 

@@ -1,5 +1,6 @@
 
 
+using System.Dynamic;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -44,5 +45,58 @@ public class UsersControllerTest : BaseIntegrationTest
     Assert.Single(responseList.Data);
     Assert.Equal("irwansyah@gmail.com", responseList.Data[0].Email);
 
+  }
+
+  [Theory]
+  [InlineData("", "lastname", "role", "password", "abcd@gmail.com", "First name is required")]
+  [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890", "lastname", "role", "password", "abcd@gmail.com", "The field FirstName must be a string with a maximum length of 100.")]
+  [InlineData("firwstnae", "", "role", "password", "abcd@gmail.com", "Last name is required")]
+  [InlineData("firwstnae", "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890", "role", "password", "abcd@gmail.com", "The field LastName must be a string with a maximum length of 100.")]
+  [InlineData("firwstnae", "lastname", "", "password", "abcd@gmail.com", "Role is required")]
+  [InlineData("firwstnae", "lastname", "1234567890123456789012345678901234567890", "password", "abcd@gmail.com", "The field Role must be a string with a maximum length of 20.")]
+  [InlineData("firwstnae", "lastname", "role", "password", "abcd@gmail.com", "Role is not valid")]
+  [InlineData("firwstnae", "lastname", "user", "", "abcd@gmail.com", "Password is required")]
+  [InlineData("firwstnae", "lastname", "user", "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890", "abcd@gmail.com", "The field Password must be a string with a maximum length of 80.")]
+  [InlineData("firwstnae", "lastname", "user", "asdadda", "", "Email is required, The Email field is not a valid e-mail address.")]
+  [InlineData("firwstnae", "lastname", "user", "asdadda", "a@", "The Email field is not a valid e-mail address.")]
+  [InlineData("firwstnae", "lastname", "user", "asdadda", "a@123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890.com", "The field Email must be a string with a maximum length of 100.")]
+
+  public async Task Test_Create_Users_MakeSureRequestValidationsAreWorking(string firstName, string lastName,
+      string role, string password, string email, string errorMessage)
+  {
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/users");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    var createUserRequest = $$"""
+    {
+      "firstName": "{{firstName}}",
+      "lastName": "{{lastName}}",
+      "role": "{{role}}",
+      "password": "{{password}}",
+      "email": "{{email}}"
+    }
+    """;
+
+    _logger.LogDebug("createUserRequest:" + createUserRequest);
+
+    request.Content = new StringContent(createUserRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    _logger.LogDebug($"responseString: {responseString}");
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug($"responseData: {responseData}");
+
+
+    Assert.NotNull(responseData);
+    Assert.Equal(false, responseData.isSuccess);
+    Assert.Equal(errorMessage, responseData.error.message);
   }
 }
