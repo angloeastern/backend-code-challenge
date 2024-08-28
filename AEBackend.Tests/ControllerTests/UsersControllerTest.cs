@@ -213,6 +213,7 @@ public class UsersControllerTest : BaseIntegrationTest
 
     Assert.NotNull(responseData);
     Assert.Equal(true, responseData.isSuccess);
+    Assert.NotEmpty(responseData.data.id);
     Assert.Equal("juki", responseData.data.firstName);
     Assert.Equal("juki", responseData.data.lastName);
     Assert.Equal("juki@gmail.com", responseData.data.email);
