@@ -7,7 +7,10 @@ namespace AEBackend.Repositories.RepositoryUsingEF
 {
   public class AppDBContext(DbContextOptions options) : IdentityDbContext<User>(options)
   {
-    public DbSet<Port> Ports { get; internal set; }
+    public DbSet<Port> Ports { get; set; }
+    public DbSet<Ship> Ships { get; set; }
+
+    public DbSet<UserShip> UserShips { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,15 +48,19 @@ namespace AEBackend.Repositories.RepositoryUsingEF
         b.HasMany(e => e.UserShips)
               .WithOne(e => e.User)
               .HasForeignKey(ur => ur.UserId)
-              .IsRequired();
+              .IsRequired(false);
 
       });
 
+      modelBuilder.Entity<Port>();
+
       modelBuilder.Entity<Ship>(s =>
       {
+        s.Property(s => s.Name).IsRequired();
         s.HasMany(e => e.UserShips)
           .WithOne(e => e.Ship)
-          .HasForeignKey(ur => ur.ShipId);
+          .HasForeignKey(ur => ur.ShipId)
+          .IsRequired(false);
 
         s.OwnsOne(x => x.Velocity);
       });

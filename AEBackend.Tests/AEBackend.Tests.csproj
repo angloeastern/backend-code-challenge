@@ -46,5 +46,17 @@
     <ProjectReference Include="..\AEBackend\AEBackend.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="xunit.runner.json"> 
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>  
+
+  <ItemGroup>
+      <AssemblyAttribute Include="Xunit.CollectionBehaviorAttribute">
+          <_Parameter1>DisableTestParallelization = true</_Parameter1>
+          <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      </AssemblyAttribute>
+  </ItemGroup>  
 
 </Project>

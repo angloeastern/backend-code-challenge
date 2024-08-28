@@ -161,6 +161,7 @@ public class Program
         builder.Services.AddTransient<Seeder>();
         builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
         builder.Services.AddTransient<IUserRepository, UserRepositoryUsingEF>();
+        builder.Services.AddTransient<ShipRepositoryUsingEF, ShipRepositoryUsingEF>();
     }
 
     private void SetupIdentityCore(WebApplicationBuilder builder)
@@ -218,13 +219,6 @@ public class Program
         });
         builder.Logging.AddConsole();
 
-        // builder.Services.AddAuthorization(options =>
-        //  {
-        //      options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(AppRoles.AdministratorRole));
-        //      options.AddPolicy("RequireVipUserRole", policy => policy.RequireRole(AppRoles.VipUserRole));
-        //      options.AddPolicy("RequireUserRole", policy => policy.RequireRole(AppRoles.UserRole));
-        //      options.AddPolicy("RequireUserRoleOrVipUserRole", policy => policy.RequireRole(AppRoles.UserRole, AppRoles.VipUserRole));
-        //  });
         builder.Services.AddAuthorization();
 
         SetupApiRateLimiter(builder);
@@ -255,10 +249,9 @@ public class Program
 
 
         var app = CreateApp(args);
+
         await ApplyMigrations(app);
         await SeedData(app);
-
-
 
         app.Run();
     }

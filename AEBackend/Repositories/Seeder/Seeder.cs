@@ -1,6 +1,7 @@
 using AEBackend.DomainModels;
 using AEBackend.Repositories.RepositoryUsingEF;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Utilities;
@@ -10,49 +11,84 @@ namespace AEBackend.Repositories.Seeder;
 
 public class Seeder
 {
-  private readonly AppDBContext _appDBContext;
+
   private readonly ILogger<Seeder> _logger;
+  private readonly AppDBContext _appDBContext;
 
   public Seeder(AppDBContext appDBContext, ILogger<Seeder> logger)
   {
     _appDBContext = appDBContext;
+
     _logger = logger;
   }
 
   private async Task SeedAdminUser()
   {
-    if (!_appDBContext.Users.Any())
+    string ADMIN_ID = "203557e0-b2f4-449c-9671-e69fe5ee6d86";
+    if (!_appDBContext.Users.Any(x => x.Email == "irwansyah@gmail.com"))
     {
-      string ADMIN_ID = "203557e0-b2f4-449c-9671-e69fe5ee6d86";
+      _logger.LogDebug("USER NOT EXISTS:" + ADMIN_ID);
 
-      await _appDBContext.Roles.AddAsync(AppRoles.Administrator);
+      _appDBContext.Roles.Add(AppRoles.Administrator);
 
       User adminUser = new()
       {
         Id = ADMIN_ID,
         Email = "irwansyah@gmail.com",
         EmailConfirmed = true,
-        FirstName = "Irwansyah",
+        FirstName = "Irwansyah" + _appDBContext.ContextId,
         LastName = "Irwansyah",
         UserName = "irwansyah@gmail.com",
         NormalizedUserName = "IRWANSYAH@GMAIL.COM",
         NormalizedEmail = "IRWANSYAH@GMAIL.COM",
       };
 
+      _logger.LogDebug("DB CONTEXT ID:" + _appDBContext.ContextId + ". ADDING ADMIN USER");
+
       PasswordHasher<User> ph = new();
       adminUser.PasswordHash = ph.HashPassword(adminUser, "Abcd1234!");
-      await _appDBContext.Users.AddAsync(adminUser);
+
+      var allUsers = _appDBContext.Users.ToList();
+      allUsers.ForEach(u =>
+      {
+        _logger.LogDebug("EXISTING USER EMAIL:" + u.Email + " ID:" + u.Id);
+      });
+
+      try
+      {
+        _logger.LogDebug("******** BEFORE ADDING USER adminUserID:" + adminUser.Id);
+
+        foreach (var dbEntityEntry in _appDBContext.ChangeTracker.Entries<User>())
+        {
+          _logger.LogDebug("******** GTracker user id:" + dbEntityEntry.Entity.Id);
+        }
+
+        await _appDBContext.Users.AddAsync(adminUser);
+
+      }
+      catch (System.Exception)
+      {
+        _logger.LogDebug("******** ERROR WHEN ADDING USER adminUserID:" + adminUser.Id);
+
+        foreach (var dbEntityEntry in _appDBContext.ChangeTracker.Entries<User>())
+        {
+          _logger.LogDebug("******** GTracker user id:" + dbEntityEntry.Entity.Id + " fname:" + dbEntityEntry.Entity.FirstName);
+        }
+      }
 
 
       ApplicationUserRole identityUserRole = new()
       {
         RoleId = AppRoles.Administrator.Id,
-        UserId = ADMIN_ID
+        UserId = adminUser.Id
       };
 
-      await _appDBContext.UserRoles.AddAsync(identityUserRole);
+      _appDBContext.UserRoles.Add(identityUserRole);
+
+      _logger.LogDebug("******* Calling SaveChangesAsync");
       await _appDBContext.SaveChangesAsync();
     }
+
   }
 
   private async Task SeedUserRoles()
@@ -114,10 +150,10 @@ public class Seeder
       Ship ship = new Ship
       {
         Lat = pointBandung[0],
-        Long = pointBandung[1],
+        Longi = pointBandung[1],
         Velocity = new Knot(16)
       };
-      Point currentLocation = new Point(new Coordinate(ship.Lat, ship.Long));
+      Point currentLocation = new Point(new Coordinate(ship.Lat, ship.Longi));
 
 
 
@@ -137,5 +173,6 @@ public class Seeder
     await SeedAdminUser();
     await SeedUserRoles();
     await SeedPorts();
+
   }
 }

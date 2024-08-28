@@ -22,10 +22,12 @@ using Xunit.Abstractions;
 
 namespace AEBackend.Tests.ControllerTests;
 
-public class UsersControllerTest : BaseIntegrationTest
+public class UsersControllerTest : BaseControllerTest
 {
-  public UsersControllerTest(TestApiFixture fixture) : base(fixture)
+
+  public UsersControllerTest(CustomWebApplicationFactory factory) : base(factory)
   {
+    // _logger.LogDebug("Container ID:" + fixture.ContainerId);
   }
 
   [Fact]
@@ -110,6 +112,7 @@ public class UsersControllerTest : BaseIntegrationTest
   {
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
 
+
     var token = await GetLoginToken();
 
 
@@ -173,12 +176,15 @@ public class UsersControllerTest : BaseIntegrationTest
 
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
 
+
   }
 
   [Fact]
   public async Task Test_Create_Users_MustStoredAllFieldsCorrectly()
   {
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
+
+
 
     var token = await GetLoginToken();
 
@@ -220,6 +226,7 @@ public class UsersControllerTest : BaseIntegrationTest
     Assert.Equal("User", responseData.data.userRoles[0].role.name);
 
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
+
 
   }
 }

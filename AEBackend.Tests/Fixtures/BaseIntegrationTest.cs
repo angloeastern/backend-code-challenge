@@ -98,5 +98,6 @@ public abstract class BaseIntegrationTest
   {
     _serviceScope.Dispose();
     _httpClient.Dispose();
+    // _fixture.Dispose();
   }
 }

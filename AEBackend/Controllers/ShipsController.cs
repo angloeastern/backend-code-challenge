@@ -1,6 +1,8 @@
 using AEBackend.Controllers;
 using AEBackend.Controllers.Utils;
 using AEBackend.DomainModels;
+using AEBackend.DTOs;
+using AEBackend.Repositories.RepositoryUsingEF;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -10,6 +12,11 @@ using Swashbuckle.AspNetCore.Annotations;
 
 public class ShipsController : ApplicationController
 {
+  private ShipRepositoryUsingEF _shipRepository;
+  public ShipsController(ShipRepositoryUsingEF shipRepository)
+  {
+    _shipRepository = shipRepository;
+  }
   [HttpGet]
   [SwaggerOperation("See all ships in the system")]
   public Task<ApiResult<List<User>>> Get()
@@ -19,9 +26,38 @@ public class ShipsController : ApplicationController
 
   [HttpPost]
   [SwaggerOperation("Add a ship to the system")]
-  public Task<ApiResult<List<User>>> Add()
+  public async Task<ApiResult<Ship>> Add([FromBody] CreateShipRequest createShipRequest)
   {
-    throw new Exception();
+    try
+    {
+      if (ModelState.IsValid)
+      {
+        bool isShipNameExists = await _shipRepository.IsShipNameExists(createShipRequest.Name.Trim());
+        if (isShipNameExists)
+        {
+          return ApiResult.Failure<Ship>(new ApiError("Ship Name already taken"));
+        }
+
+        Ship newShip = new()
+        {
+          Lat = createShipRequest.Lat,
+          Longi = createShipRequest.Long,
+          Name = createShipRequest.Name,
+          Velocity = new Knot(createShipRequest.KnotVelocity)
+        };
+        await _shipRepository.CreateShip(newShip);
+
+        return ApiResult.Success(newShip);
+      }
+      else
+      {
+        return ApiResult.Failure<Ship>(string.Join(", ", GetModelStateErrors()));
+      }
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<Ship>(new ApiError(ex.ToString()));
+    }
   }
 
   [HttpPut("{0}/Velocity")]

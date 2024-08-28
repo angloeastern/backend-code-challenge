@@ -1,6 +1,10 @@
 {
   "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
   
-  "shadowCopy": false
+  "shadowCopy": false,
+
+  "parallelizeAssembly": false,
+  "parallelizeTestCollections": false
+  
   
 }
