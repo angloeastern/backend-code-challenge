@@ -99,4 +99,69 @@ public class UsersControllerTest : BaseIntegrationTest
     Assert.Equal(false, responseData.isSuccess);
     Assert.Equal(errorMessage, responseData.error.message);
   }
+
+  [Fact]
+  public async Task Test_Create_Users_MustNotAllowDuplicatedEmail()
+  {
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/users");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    var createUserRequest = $$"""
+    {
+      "firstName": "juki",
+      "lastName": "juki",
+      "role": "User",
+      "password": "Abcd1234!",
+      "email": "juki@gmail.com"
+    }
+    """;
+
+    _logger.LogDebug("createUserRequest:" + createUserRequest);
+
+    request.Content = new StringContent(createUserRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    _logger.LogDebug($"responseString: {responseString}");
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug($"responseData: {responseData}");
+
+
+    Assert.NotNull(responseData);
+    Assert.Equal(true, responseData.isSuccess);
+
+    //Send another request with the same email
+    createUserRequest = $$"""
+    {
+      "firstName": "juki2",
+      "lastName": "juki",
+      "role": "User",
+      "password": "Abcd1234!",
+      "email": "juki@gmail.com"
+    }
+    """;
+    request = new HttpRequestMessage(HttpMethod.Post, "api/v1/users");
+    request.Headers.Add("Authorization", "Bearer " + token);
+    request.Content = new StringContent(createUserRequest, Encoding.UTF8, "application/json");
+
+    response = await _httpClient.SendAsync(request);
+
+    responseString = await response.Content.ReadAsStringAsync();
+
+    _logger.LogDebug($"responseString: {responseString}");
+
+    responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    Assert.NotNull(responseData);
+    Assert.Equal(false, responseData.isSuccess);
+    Assert.Equal("Email already taken", responseData.error.message);
+
+  }
 }
