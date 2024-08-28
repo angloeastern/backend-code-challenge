@@ -18,7 +18,8 @@ rr:
 	docker compose restart server
 
 test:
-	docker compose exec -w /source/AEBackend.Tests server  dotnet test --logger "console;verbosity=detailed"
+	dotnet test --logger "console;verbosity=detailed"
+	# docker compose exec -w /source/AEBackend.Tests server  dotnet test --logger "console;verbosity=detailed"
 
 
 recreate-all: destroy destroy-image run

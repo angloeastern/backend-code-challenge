@@ -46,11 +46,18 @@ ARG TARGETARCH
 RUN dotnet test --logger "console;verbosity=detailed" 
 
 #### TARGET: development
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS development
 
 COPY . /source
 
 WORKDIR /source
+
+# RUN apt-get update  \
+#     && apt-get install -y libsqlite3-mod-spatialite \
+#     && apt-get install -y libspatialite-dev
+
+RUN apt-get update  \
+    && apt-get install -y libsqlite3-mod-spatialite 
 
 RUN  dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
@@ -65,10 +72,8 @@ ARG TARGETARCH
 # If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
 #   work in .NET 6.0.
 WORKDIR /source/AEBackend
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -a ${TARGETARCH/amd64/x64} --use-current-runtime --self-contained false -o /app
 
-CMD dotnet run --no-launch-profile --project AEBackend.csproj
+CMD dotnet run 
 
 
 #### TARGET: final

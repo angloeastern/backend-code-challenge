@@ -13,6 +13,8 @@ namespace AEBackend.Repositories.RepositoryUsingEF
     {
       base.OnModelCreating(modelBuilder);
 
+      // modelBuilder.Entity<Port>().Property(c => c.Location).HasSrid(4326);
+
 
       modelBuilder.Entity<User>(b =>
       {

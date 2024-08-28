@@ -4,6 +4,8 @@ using AEBackend.Repositories.RepositoryUsingEF;
 using AEBackend.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
 
 public abstract class BaseIntegrationTest
     : IClassFixture<TestApiFixture>, IDisposable
@@ -12,15 +14,40 @@ public abstract class BaseIntegrationTest
   {
     _serviceScope = fixture.Services.CreateScope();
     _httpClient = fixture.CreateClient();
+    _logger = _serviceScope.ServiceProvider.GetService<ILogger<BaseIntegrationTest>>();
   }
 
   protected IServiceScope _serviceScope;
   protected HttpClient _httpClient;
+  protected ILogger<BaseIntegrationTest> _logger;
   private JsonSerializerOptions _serializerOptions = new JsonSerializerOptions()
   {
     PropertyNameCaseInsensitive = true,
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
   };
+
+
+  public async Task<string> GetLoginToken()
+  {
+    var loginRequest = new HttpRequestMessage(HttpMethod.Post, "api/v1/login");
+    var loginData = new Dictionary<string, string>{
+      {"email", "irwansyah@gmail.com"},
+      {"password", "Abcd1234!"},
+    };
+    var jsonData = JsonSerializer.Serialize(loginData);
+    var contentData = new StringContent(jsonData, Encoding.UTF8, "application/json");
+    loginRequest.Content = contentData;
+
+    var loginResponse = await _httpClient.SendAsync(loginRequest);
+    var loginResponseString = await loginResponse.Content.ReadAsStringAsync();
+
+    _logger.LogDebug("loginResponseString:" + loginResponseString);
+
+    var responseData = JsonSerializer.Deserialize<Dictionary<string, object>>(loginResponseString);
+
+    return responseData["data"].ToString();
+
+  }
 
   public async Task<TData?> GetAsync<TData>(string url)
   {
