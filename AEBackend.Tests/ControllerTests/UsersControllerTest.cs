@@ -8,12 +8,16 @@ using AEBackend.Controllers;
 using AEBackend.Controllers.Utils;
 using AEBackend.DomainModels;
 using AEBackend.DTOs;
+using AEBackend.Repositories.RepositoryUsingEF;
 using AEBackend.Tests.Fixtures;
 using Docker.DotNet.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Npgsql;
+using Respawn;
 using Xunit.Abstractions;
 
 namespace AEBackend.Tests.ControllerTests;
@@ -27,6 +31,7 @@ public class UsersControllerTest : BaseIntegrationTest
   [Fact]
   public async Task Test_Get_Users_MustReturnAllUsers()
   {
+
     var token = await GetLoginToken();
 
 
@@ -103,6 +108,8 @@ public class UsersControllerTest : BaseIntegrationTest
   [Fact]
   public async Task Test_Create_Users_MustNotAllowDuplicatedEmail()
   {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
+
     var token = await GetLoginToken();
 
 
@@ -137,6 +144,7 @@ public class UsersControllerTest : BaseIntegrationTest
     Assert.NotNull(responseData);
     Assert.Equal(true, responseData.isSuccess);
 
+
     //Send another request with the same email
     createUserRequest = $$"""
     {
@@ -162,6 +170,55 @@ public class UsersControllerTest : BaseIntegrationTest
     Assert.NotNull(responseData);
     Assert.Equal(false, responseData.isSuccess);
     Assert.Equal("Email already taken", responseData.error.message);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
+
+  }
+
+  [Fact]
+  public async Task Test_Create_Users_MustStoredAllFieldsCorrectly()
+  {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
+
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/users");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    var createUserRequest = $$"""
+    {
+      "firstName": "juki",
+      "lastName": "juki",
+      "role": "User",
+      "password": "Abcd1234!",
+      "email": "juki@gmail.com"
+    }
+    """;
+
+    _logger.LogDebug("createUserRequest:" + createUserRequest);
+
+    request.Content = new StringContent(createUserRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    _logger.LogDebug($"responseString: {responseString}");
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug($"responseData: {responseData}");
+
+
+    Assert.NotNull(responseData);
+    Assert.Equal(true, responseData.isSuccess);
+    Assert.Equal("juki", responseData.data.firstName);
+    Assert.Equal("juki", responseData.data.lastName);
+    Assert.Equal("juki@gmail.com", responseData.data.email);
+    Assert.Equal("User", responseData.data.userRoles[0].role.name);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
 
   }
 }

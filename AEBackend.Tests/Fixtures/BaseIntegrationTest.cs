@@ -5,6 +5,8 @@ using AEBackend.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Respawn;
 
 
 public abstract class BaseIntegrationTest
@@ -12,11 +14,33 @@ public abstract class BaseIntegrationTest
 {
   public BaseIntegrationTest(TestApiFixture fixture)
   {
+    _fixture = fixture;
     _serviceScope = fixture.Services.CreateScope();
     _httpClient = fixture.CreateClient();
     _logger = _serviceScope.ServiceProvider.GetService<ILogger<BaseIntegrationTest>>();
   }
 
+
+  protected async Task ResetDB()
+  {
+    using (var conn = new NpgsqlConnection(_fixture.DBConnectionString))
+    {
+
+      await conn.OpenAsync();
+
+      var respawner = await Respawner.CreateAsync(conn, new RespawnerOptions
+      {
+        SchemasToInclude = new[]
+          {
+              "public"
+          },
+        DbAdapter = DbAdapter.Postgres
+      });
+
+      await respawner.ResetAsync(conn);
+    }
+  }
+  protected TestApiFixture _fixture;
   protected IServiceScope _serviceScope;
   protected HttpClient _httpClient;
   protected ILogger<BaseIntegrationTest> _logger;

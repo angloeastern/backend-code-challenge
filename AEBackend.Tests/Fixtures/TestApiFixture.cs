@@ -30,6 +30,14 @@ public class TestApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
     return _dbContainer.StartAsync();
   }
 
+  public string DBConnectionString
+  {
+    get
+    {
+      return _dbContainer.GetConnectionString();
+    }
+  }
+
   public new Task DisposeAsync()
   {
 
@@ -94,8 +102,6 @@ public class TestApiFixture : WebApplicationFactory<Program>, IAsyncLifetime
            });
 
     builder.UseEnvironment("Development");
-
-
 
   }
 
