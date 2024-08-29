@@ -31,4 +31,18 @@ public class ShipRepositoryUsingEF
     return _AppDBContext.Ships.ToListAsync();
   }
 
+  public async Task<Ship?> UpdateShipVelocity(string id, double newVelocity)
+  {
+    var existingShip = await _AppDBContext.Ships.Where(x => x.Id == id).SingleOrDefaultAsync();
+    if (existingShip == null)
+    {
+      return null;
+    }
+
+    existingShip.Velocity = new Knot(newVelocity);
+    _AppDBContext.Update(existingShip);
+    await _AppDBContext.SaveChangesAsync();
+
+    return existingShip;
+  }
 }

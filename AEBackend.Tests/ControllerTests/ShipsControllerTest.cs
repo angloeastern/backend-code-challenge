@@ -167,7 +167,6 @@ public class ShipsControllerTest : BaseControllerTest
   }
 
   [Fact]
-  [Trait("TraitName", "Filtered")]
   public async Task Test_Get_Ships_MustReturnAllShips()
   {
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
@@ -221,6 +220,136 @@ public class ShipsControllerTest : BaseControllerTest
 
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
 
+  }
+
+  [Fact]
+  public async Task Test_Update_Ship_Velocity_MustStoredFieldsCorrecly()
+  {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "Ship1").ExecuteDeleteAsync();
+
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/ships");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    var createShipRequest = $$"""
+    {
+      "name": "Ship1",
+      "knotVelocity": 10,
+      "lat": 20.2,
+      "long": 10.5      
+    }
+    """;
+
+    request.Content = new StringContent(createShipRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug("$$$$$$$ responseString:" + responseString);
+
+    Assert.Equal(true, responseData.isSuccess);
+
+    //Update ship velocity
+    request = new HttpRequestMessage(HttpMethod.Put, $"api/v1/ships/{responseData.data.id}/Velocity");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    _logger.LogDebug("%%%% update uri: " + request.RequestUri);
+
+    var updateShipVelocityRequest = $$"""
+    {      
+      "knotVelocity": 30
+    }
+    """;
+
+    _logger.LogDebug("%%%%%% updateShipVelocityRequest:" + updateShipVelocityRequest);
+
+    request.Content = new StringContent(updateShipVelocityRequest, Encoding.UTF8, "application/json");
+
+    response = await _httpClient.SendAsync(request);
+
+    responseString = await response.Content.ReadAsStringAsync();
+
+    responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug("$$$$$$$ responseUpdateString:" + responseString);
+
+    Assert.Equal(true, responseData.isSuccess);
+    Assert.Equal(30, responseData.data.velocity.value);
+    Assert.Equal("Knot", responseData.data.velocity.unitName);
+    Assert.Equal(20.2, responseData.data.lat);
+    Assert.Equal(10.5, responseData.data.longi);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "Ship1").ExecuteDeleteAsync();
+  }
+
+  [Theory]
+  [Trait("TraitName", "Filtered")]
+  [InlineData(-1, "The field KnotVelocity must be between 0 and 60.")]
+  [InlineData(61, "The field KnotVelocity must be between 0 and 60.")]
+  public async Task Test_Update_Ship_Velocity_MustValidateRequestsCorrectly(double knotVelocity, string errorMessage)
+  {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "Ship1").ExecuteDeleteAsync();
+
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/ships");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    var createShipRequest = $$"""
+    {
+      "name": "Ship1",
+      "knotVelocity": 10,
+      "lat": 20.2,
+      "long": 10.5      
+    }
+    """;
+
+    request.Content = new StringContent(createShipRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug("$$$$$$$ responseString:" + responseString);
+
+    Assert.Equal(true, responseData.isSuccess);
+
+    //Update ship velocity
+    request = new HttpRequestMessage(HttpMethod.Put, $"api/v1/ships/{responseData.data.id}/Velocity");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    _logger.LogDebug("%%%% update uri: " + request.RequestUri);
+
+    var updateShipVelocityRequest = $$"""
+    {      
+      "knotVelocity": {{knotVelocity}}
+    }
+    """;
+
+    _logger.LogDebug("%%%%%% updateShipVelocityRequest:" + updateShipVelocityRequest);
+
+    request.Content = new StringContent(updateShipVelocityRequest, Encoding.UTF8, "application/json");
+
+    response = await _httpClient.SendAsync(request);
+
+    responseString = await response.Content.ReadAsStringAsync();
+
+    responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug("$$$$$$$ responseUpdateString:" + responseString);
+
+    Assert.Equal(false, responseData.isSuccess);
+    Assert.Equal(errorMessage, responseData.error.message);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "Ship1").ExecuteDeleteAsync();
   }
 
 }

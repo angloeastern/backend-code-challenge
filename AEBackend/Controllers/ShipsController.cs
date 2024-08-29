@@ -13,9 +13,11 @@ using Swashbuckle.AspNetCore.Annotations;
 public class ShipsController : ApplicationController
 {
   private ShipRepositoryUsingEF _shipRepository;
-  public ShipsController(ShipRepositoryUsingEF shipRepository)
+  private ILogger<ShipsController> _logger;
+  public ShipsController(ShipRepositoryUsingEF shipRepository, ILogger<ShipsController> logger)
   {
     _shipRepository = shipRepository;
+    _logger = logger;
   }
   [HttpGet]
   [SwaggerOperation("See all ships in the system")]
@@ -70,11 +72,33 @@ public class ShipsController : ApplicationController
     }
   }
 
-  [HttpPut("{0}/Velocity")]
+  [HttpPut("{id}/Velocity")]
   [SwaggerOperation("Update velocity of a ship")]
-  public Task<ApiResult<List<User>>> UpdateVelocity()
+  public async Task<ApiResult<Ship>> UpdateVelocity([FromRoute] string id, [FromBody] UpdateShipVelocityRequest updateShipVelocityRequest)
   {
-    throw new Exception();
+    try
+    {
+      _logger.LogDebug("%%%%% Id: " + updateShipVelocityRequest.KnotVelocity);
+
+      if (ModelState.IsValid)
+      {
+        Ship updatedShip = await _shipRepository.UpdateShipVelocity(id, updateShipVelocityRequest.KnotVelocity);
+        if (updatedShip == null)
+        {
+          return ApiResult.Failure<Ship>(new ApiError("Ship not found"));
+        }
+
+        return ApiResult.Success(updatedShip);
+      }
+      else
+      {
+        return ApiResult.Failure<Ship>(string.Join(", ", GetModelStateErrors()));
+      }
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<Ship>(new ApiError(ex.ToString()));
+    }
   }
   [HttpGet("Unassigneds")]
   [SwaggerOperation("See ships unassigned in the system")]
