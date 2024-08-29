@@ -169,7 +169,7 @@ public class ShipsControllerTest : BaseControllerTest
   [Fact]
   public async Task Test_Get_Ships_MustReturnAllShips()
   {
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
+    _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name.StartsWith("Ship-ABC")).ExecuteDelete();
 
     var token = await GetLoginToken();
 
@@ -215,14 +215,14 @@ public class ShipsControllerTest : BaseControllerTest
 
 
     Assert.Equal(true, responseRetrieveData.isSuccess);
-    Assert.Equal(3, responseRetrieveData.data.Count);
+    Assert.True(responseRetrieveData.data.Count >= 3);
 
     List<dynamic> existingShips = responseRetrieveData.data;
     Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-1"));
     Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-2"));
     Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-3"));
 
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
+    _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name.StartsWith("Ship-ABC")).ExecuteDelete();
 
   }
 

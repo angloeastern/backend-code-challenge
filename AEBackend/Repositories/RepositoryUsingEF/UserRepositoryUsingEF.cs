@@ -56,6 +56,13 @@ public class UserRepositoryUsingEF : IUserRepository
     return _AppDBContext.Users.Include(x => x.UserRoles).ThenInclude(ur => ur.Role).Include(u => u.UserShips).ThenInclude(s => s.Ship).Where(x => x.Id == id).SingleOrDefaultAsync();
   }
 
+  public async Task<List<Ship>> GetUserShips(string userId)
+  {
+    var userShips = await _AppDBContext.Users.Include(u => u.UserShips).ThenInclude(us => us.Ship).Where(x => x.Id == userId).SingleAsync();
+
+    return userShips.UserShips.Select(x => x.Ship).ToList();
+  }
+
   public async Task<User> UpdateUserShips(User existingUser, string[] shipdIds)
   {
 

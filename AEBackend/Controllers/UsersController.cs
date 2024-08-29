@@ -57,17 +57,17 @@ public class UsersController : ApplicationController
 
   [HttpGet("{userId}/Ships")]
   [SwaggerOperation("See ships assigned to a specific user")]
-  public async Task<ApiResult<List<User>>> GetShips()
+  public async Task<ApiResult<List<Ship>>> GetShips([FromRoute] string userId)
   {
     try
     {
-      var users = await _userRepository.GetAllUsers();
+      var userShips = await _userRepository.GetUserShips(userId);
 
-      return ApiResult.Success(users);
+      return ApiResult.Success(userShips);
     }
     catch (System.Exception ex)
     {
-      return ApiResult.Failure<List<User>>(new ApiError(ex.ToString()));
+      return ApiResult.Failure<List<Ship>>(new ApiError(ex.ToString()));
     }
   }
 

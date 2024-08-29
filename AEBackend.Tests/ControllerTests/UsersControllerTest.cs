@@ -229,18 +229,18 @@ public class UsersControllerTest : BaseControllerTest
   }
 
   [Fact]
-  [Trait("TraitName", "Filtered")]
   public async Task Test_Update_Ships_Assigned_To_Users_MustUpdateCorrectly()
   {
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().UserShips.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x =>
 
-      new List<string>{
-        "juki1@gmail.com", "juki2@gmail.com", "juki2@gmail.com"
-      }.Contains(x.Email)
+    var dbContext = _serviceScope.ServiceProvider.GetService<AppDBContext>();
+    var cleanUpUsers = dbContext.Users.Include(u => u.UserShips).Where(x => x.Email.StartsWith("juki-update-ship")).ToList();
+    dbContext.RemoveRange(cleanUpUsers);
+    var cleanUpShips = dbContext.Ships.Include(x => x.UserShips).Where(x => x.Name.StartsWith("ShipUpdate")).ToList();
+    dbContext.RemoveRange(cleanUpShips);
+    dbContext.SaveChanges();
 
-    ).ExecuteDeleteAsync();
+
+
 
 
 
@@ -258,7 +258,7 @@ public class UsersControllerTest : BaseControllerTest
           "lastName": "juki",
           "role": "User",
           "password": "Abcd1234!",
-          "email": "juki{{i}}@gmail.com"
+          "email": "juki-update-ship{{i}}@gmail.com"
         }
         """;
 
@@ -290,7 +290,7 @@ public class UsersControllerTest : BaseControllerTest
 
       var createShipRequest = $$"""
         {
-          "name": "Ship{{i}}",
+          "name": "ShipUpdate{{i}}",
           "knotVelocity": 10,
           "lat": 20.2,
           "long": 10.5      
@@ -417,15 +417,194 @@ public class UsersControllerTest : BaseControllerTest
     Assert.True(updatedShips.Select(x => x.shipId).ToList().Contains(createdShips[1].id));
     Assert.True(updatedShips.Select(x => x.shipId).ToList().Contains(createdShips[4].id));
 
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().UserShips.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x =>
 
-      new List<string>{
-        "juki1@gmail.com", "juki2@gmail.com", "juki2@gmail.com"
-      }.Contains(x.Email)
+    cleanUpUsers = dbContext.Users.Include(u => u.UserShips).Where(x => x.Email.StartsWith("juki-update-ship")).ToList();
+    dbContext.RemoveRange(cleanUpUsers);
+    cleanUpShips = dbContext.Ships.Include(x => x.UserShips).Where(x => x.Name.StartsWith("ShipUpdate")).ToList();
+    dbContext.RemoveRange(cleanUpShips);
+    dbContext.SaveChanges();
 
-    ).ExecuteDeleteAsync();
   }
 
+
+  [Fact]
+  [Trait("TraitName", "Filtered")]
+  public async Task Test_See_Ships_Assigned_To_SpecificUser_MustReturnedCorrectly()
+  {
+    var dbContext = _serviceScope.ServiceProvider.GetService<AppDBContext>();
+    var cleanUpUsers = dbContext.Users.Include(u => u.UserShips).Where(x => x.Email.StartsWith("ronni")).ToList();
+    dbContext.RemoveRange(cleanUpUsers);
+    var cleanUpShips = dbContext.Ships.Include(x => x.UserShips).Where(x => x.Name.StartsWith("ShipSSU")).ToList();
+    dbContext.RemoveRange(cleanUpShips);
+    dbContext.SaveChanges();
+
+
+
+    var token = await GetLoginToken();
+
+    //Create two new users
+    for (int i = 1; i <= 2; i++)
+    {
+      var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/users");
+      request.Headers.Add("Authorization", "Bearer " + token);
+
+      var createUserRequest = $$"""
+            {
+              "firstName": "User{{i}}",
+              "lastName": "ronni",
+              "role": "User",
+              "password": "Abcd1234!",
+              "email": "ronni{{i}}@gmail.com"
+            }
+            """;
+
+      _logger.LogDebug("createUserRequest:" + createUserRequest);
+
+      request.Content = new StringContent(createUserRequest, Encoding.UTF8, "application/json");
+
+      var response = await _httpClient.SendAsync(request);
+
+      var responseString = await response.Content.ReadAsStringAsync();
+
+      _logger.LogDebug($"responseString: {responseString}");
+
+      dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+      _logger.LogDebug($"responseData: {responseData}");
+
+
+      Assert.NotNull(responseData);
+      Assert.Equal(true, responseData.isSuccess);
+    }
+
+    //Create 5 new ships
+    List<dynamic> createdShips = [];
+    for (int i = 1; i <= 5; i++)
+    {
+      var requestCreateShip = new HttpRequestMessage(HttpMethod.Post, "api/v1/ships");
+      requestCreateShip.Headers.Add("Authorization", "Bearer " + token);
+
+      var createShipRequest = $$"""
+            {
+              "name": "ShipSSU{{i}}",
+              "knotVelocity": 10,
+              "lat": 20.2,
+              "long": 10.5      
+            }
+            """;
+
+
+      requestCreateShip.Content = new StringContent(createShipRequest, Encoding.UTF8, "application/json");
+
+      var responseCreateShip = await _httpClient.SendAsync(requestCreateShip);
+
+      var responseStringCreateShip = await responseCreateShip.Content.ReadAsStringAsync();
+
+      _logger.LogDebug($"responseStringCreateShip: {responseStringCreateShip}");
+
+      dynamic responseDataCreateShip = JsonConvert.DeserializeObject<ExpandoObject>(responseStringCreateShip);
+
+      _logger.LogDebug($"responseDataCreateShip: {responseDataCreateShip}");
+
+      createdShips.Add(responseDataCreateShip.data);
+
+
+      Assert.NotNull(responseDataCreateShip);
+      Assert.Equal(true, responseDataCreateShip.isSuccess);
+    }
+
+    //Retrieve all created users
+    var requestAllUsers = new HttpRequestMessage(HttpMethod.Get, "api/v1/users");
+    requestAllUsers.Headers.Add("Authorization", "Bearer " + token);
+
+    var responseAllUsers = await _httpClient.SendAsync(requestAllUsers);
+
+    var responseStringAllUsers = await responseAllUsers.Content.ReadAsStringAsync();
+
+    _logger.LogDebug($"responseStringAllUsers: {responseStringAllUsers}");
+
+    dynamic allUsersResponse = JsonConvert.DeserializeObject<ExpandoObject>(responseStringAllUsers);
+
+    _logger.LogDebug($"allUsersResponse: {allUsersResponse}");
+
+    Assert.Equal(true, allUsersResponse.isSuccess);
+
+    //Assign each users two ships
+    for (int i = 1; i <= 2; i++)
+    {
+      dynamic currentUser = allUsersResponse.data[i - 1];
+      List<string> chosenShipsIds = [];
+      List<dynamic> chosenShips = [];
+      for (int j = 1; j <= 2; j++)
+      {
+        dynamic chosenShip = createdShips[(j - 1) * i];
+
+        _logger.LogDebug("%%% chosenShip:" + (string)chosenShip.id);
+
+        chosenShipsIds.Add(chosenShip.id);
+        chosenShips.Add(chosenShip);
+      }
+
+      var requestAssignShip = new HttpRequestMessage(HttpMethod.Put, $"api/v1/users/{allUsersResponse.data[i - 1].id}/Ships");
+
+      _logger.LogDebug("%%% requestAssignShip.RequestUri:" + requestAssignShip.RequestUri);
+
+      requestAssignShip.Headers.Add("Authorization", "Bearer " + token);
+
+      var updateShipRequest = $$"""
+            {
+              "shipdIds": {{JsonConvert.SerializeObject(chosenShipsIds)}}
+            }
+            """;
+
+      _logger.LogDebug("%%% updateShipRequest:" + updateShipRequest);
+
+      requestAssignShip.Content = new StringContent(updateShipRequest, Encoding.UTF8, "application/json");
+
+
+      var responseAssignShip = await _httpClient.SendAsync(requestAssignShip);
+
+      var responsStringAssignShip = await responseAssignShip.Content.ReadAsStringAsync();
+
+
+      _logger.LogDebug($"responsStringAssignShip: {responsStringAssignShip}");
+
+      dynamic assignShipResponse = JsonConvert.DeserializeObject<ExpandoObject>(responsStringAssignShip);
+
+      Assert.Equal(true, assignShipResponse.isSuccess);
+      Assert.Equal(2, assignShipResponse.data.userShips.Count);
+      Assert.Equal(chosenShipsIds[0], assignShipResponse.data.userShips[0].shipId);
+      Assert.Equal(chosenShipsIds[1], assignShipResponse.data.userShips[1].shipId);
+    }
+
+    //Retrieved assigned ships
+    var requestAssignedShips = new HttpRequestMessage(HttpMethod.Get, $"api/v1/users/{allUsersResponse.data[1].id}/Ships");
+
+    _logger.LogDebug("%%% requestAssignedShips.RequestUri:" + requestAssignedShips.RequestUri);
+
+    requestAssignedShips.Headers.Add("Authorization", "Bearer " + token);
+
+    var responseAssignedShips = await _httpClient.SendAsync(requestAssignedShips);
+
+    var responsStringAssignedShips = await responseAssignedShips.Content.ReadAsStringAsync();
+
+
+    _logger.LogDebug($"responsStringAssignedShips: {responsStringAssignedShips}");
+
+    dynamic responseUserAssignedShips = JsonConvert.DeserializeObject<ExpandoObject>(responsStringAssignedShips);
+
+    Assert.Equal(true, responseUserAssignedShips.isSuccess);
+    Assert.Equal(2, responseUserAssignedShips.data.Count);
+
+    List<dynamic> updatedShips = responseUserAssignedShips.data;
+
+    Assert.True(updatedShips.Select(x => x.id).ToList().Contains(createdShips[0].id));
+    Assert.True(updatedShips.Select(x => x.id).ToList().Contains(createdShips[2].id));
+
+    cleanUpUsers = dbContext.Users.Include(u => u.UserShips).Where(x => x.Email.StartsWith("ronni")).ToList();
+    dbContext.RemoveRange(cleanUpUsers);
+    cleanUpShips = dbContext.Ships.Include(x => x.UserShips).Where(x => x.Name.StartsWith("ShipSSU")).ToList();
+    dbContext.RemoveRange(cleanUpShips);
+    dbContext.SaveChanges();
+  }
 }

@@ -48,6 +48,7 @@ namespace AEBackend.Repositories.RepositoryUsingEF
         b.HasMany(e => e.UserShips)
               .WithOne(e => e.User)
               .HasForeignKey(ur => ur.UserId)
+              .OnDelete(DeleteBehavior.Cascade)
               .IsRequired(false);
 
       });
@@ -60,6 +61,7 @@ namespace AEBackend.Repositories.RepositoryUsingEF
         s.HasMany(e => e.UserShips)
           .WithOne(e => e.Ship)
           .HasForeignKey(ur => ur.ShipId)
+          .OnDelete(DeleteBehavior.Cascade)
           .IsRequired(false);
 
         s.OwnsOne(x => x.Velocity);
