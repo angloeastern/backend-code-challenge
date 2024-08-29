@@ -107,7 +107,7 @@ public class ShipsController : ApplicationController
     throw new Exception();
   }
 
-  [HttpGet("NearestPort")]
+  [HttpGet("{id}/NearestPort")]
   [SwaggerOperation("See the nearest port to a ship with estimated arrival time to the port together with relevant details")]
   public Task<ApiResult<NearestPortInfo>> GetNearest()
   {
