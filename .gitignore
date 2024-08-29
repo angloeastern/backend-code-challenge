@@ -1,0 +1,16 @@
+AEBackend/db/password.txt
+
+AEBackend/obj
+AEBackend.Tests/obj/
+
+AEBackend/app/
+AEBackend.Tests/app/
+
+
+AEBackend/bin/
+AEBackend.Tests/bin/
+AEBackend/obj/Debug/net8.0/AEBackend.AssemblyInfo.cs
+AEBackend/obj/Debug/net8.0/AEBackend.AssemblyInfoInputs.cache
+AEBackend/obj/AEBackend.csproj.nuget.dgspec.json
+AEBackend/obj/project.assets.json
+AEBackend/db/connection-string.txt

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEBackend", "AEBackend\AEBackend.csproj", "{E33EC8A5-E239-4F99-8363-DA773E4B148B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEBackend.Tests", "AEBackend.Tests\AEBackend.Tests.csproj", "{FDCCBA30-BCDB-47AD-94D1-AFCEE14EBBE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E33EC8A5-E239-4F99-8363-DA773E4B148B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E33EC8A5-E239-4F99-8363-DA773E4B148B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E33EC8A5-E239-4F99-8363-DA773E4B148B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E33EC8A5-E239-4F99-8363-DA773E4B148B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCCBA30-BCDB-47AD-94D1-AFCEE14EBBE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCCBA30-BCDB-47AD-94D1-AFCEE14EBBE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCCBA30-BCDB-47AD-94D1-AFCEE14EBBE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCCBA30-BCDB-47AD-94D1-AFCEE14EBBE3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FDD8D48C-924B-4B02-BB7F-15F19197A923}
+	EndGlobalSection
+EndGlobal
