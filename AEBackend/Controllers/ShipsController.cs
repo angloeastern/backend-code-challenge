@@ -19,9 +19,18 @@ public class ShipsController : ApplicationController
   }
   [HttpGet]
   [SwaggerOperation("See all ships in the system")]
-  public Task<ApiResult<List<User>>> Get()
+  public async Task<ApiResult<List<Ship>>> Get()
   {
-    throw new Exception();
+    try
+    {
+      var allShips = await _shipRepository.GetAllShips();
+
+      return ApiResult.Success(allShips);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<List<Ship>>(new ApiError(ex.ToString()));
+    }
   }
 
   [HttpPost]
@@ -40,6 +49,7 @@ public class ShipsController : ApplicationController
 
         Ship newShip = new()
         {
+          Id = Guid.NewGuid().ToString(),
           Lat = createShipRequest.Lat,
           Longi = createShipRequest.Long,
           Name = createShipRequest.Name,

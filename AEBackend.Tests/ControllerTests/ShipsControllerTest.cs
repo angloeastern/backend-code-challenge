@@ -162,6 +162,65 @@ public class ShipsControllerTest : BaseControllerTest
     Assert.Equal("Knot", responseData.data.velocity.unitName);
     Assert.Equal(20.2, responseData.data.lat);
     Assert.Equal(10.5, responseData.data.longi);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "Ship1").ExecuteDeleteAsync();
+  }
+
+  [Fact]
+  [Trait("TraitName", "Filtered")]
+  public async Task Test_Get_Ships_MustReturnAllShips()
+  {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
+
+    var token = await GetLoginToken();
+
+
+    for (var i = 1; i <= 3; i++)
+    {
+      var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/ships");
+      request.Headers.Add("Authorization", "Bearer " + token);
+
+      var createShipRequest = $$"""
+      {
+        "name": "Ship-ABC-{{i}}",
+        "knotVelocity": 10,
+        "lat": 20.2,
+        "long": 10.5      
+      }
+      """;
+
+      request.Content = new StringContent(createShipRequest, Encoding.UTF8, "application/json");
+
+      var response = await _httpClient.SendAsync(request);
+
+      var responseString = await response.Content.ReadAsStringAsync();
+
+      dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+      _logger.LogDebug("$$$$$$$ responseString:" + responseString);
+
+      Assert.Equal(true, responseData.isSuccess);
+    }
+
+    //Retrieve all ships
+    var requestRetrieve = new HttpRequestMessage(HttpMethod.Get, "api/v1/ships");
+    requestRetrieve.Headers.Add("Authorization", "Bearer " + token);
+
+    var responseRetrieve = await _httpClient.SendAsync(requestRetrieve);
+
+    var responseRetieveString = await responseRetrieve.Content.ReadAsStringAsync();
+    _logger.LogDebug("$$$$$$$ responseRetrieveString:" + responseRetieveString);
+
+    dynamic responseRetrieveData = JsonConvert.DeserializeObject<ExpandoObject>(responseRetieveString);
+
+
+
+    Assert.Equal(true, responseRetrieveData.isSuccess);
+    Assert.Equal(3, responseRetrieveData.data.Count);
+    Assert.Equal("Ship-ABC-1", responseRetrieveData.data[0].name);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
+
   }
 
 }
