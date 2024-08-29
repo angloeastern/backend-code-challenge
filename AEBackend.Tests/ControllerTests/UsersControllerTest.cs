@@ -428,7 +428,7 @@ public class UsersControllerTest : BaseControllerTest
 
 
   [Fact]
-  [Trait("TraitName", "Filtered")]
+
   public async Task Test_See_Ships_Assigned_To_SpecificUser_MustReturnedCorrectly()
   {
     var dbContext = _serviceScope.ServiceProvider.GetService<AppDBContext>();

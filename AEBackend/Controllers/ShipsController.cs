@@ -102,9 +102,18 @@ public class ShipsController : ApplicationController
   }
   [HttpGet("Unassigneds")]
   [SwaggerOperation("See ships unassigned in the system")]
-  public Task<ApiResult<List<User>>> GetUnassigneds()
+  public async Task<ApiResult<List<Ship>>> GetUnassigneds()
   {
-    throw new Exception();
+    try
+    {
+      List<Ship> unassigneds = await _shipRepository.GetUnassigneds();
+
+      return ApiResult.Success(unassigneds);
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<List<Ship>>(new ApiError(ex.ToString()));
+    }
   }
 
   [HttpGet("{id}/NearestPort")]

@@ -52,4 +52,11 @@ public class ShipRepositoryUsingEF
 
     return existingShips;
   }
+
+  public async Task<List<Ship>> GetUnassigneds()
+  {
+    var unassigneds = await _AppDBContext.Ships.Include(s => s.UserShips).Where(s => s.UserShips == null || s.UserShips.Count <= 0).ToListAsync();
+
+    return unassigneds;
+  }
 }
