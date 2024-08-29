@@ -9,7 +9,7 @@ destroy:
 
 
 destroy-image: destroy
-	docker-compose down --rmi all -v --remove-orphans
+	docker compose down --rmi all -v --remove-orphans
 
 recreate-server: destroy
 	docker compose up server --build -d
