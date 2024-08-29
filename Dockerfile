@@ -46,35 +46,16 @@ ARG TARGETARCH
 RUN dotnet test --logger "console;verbosity=detailed" 
 
 #### TARGET: development
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS development
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development
+COPY --from=build /source /source
 
-COPY . /source
-
-WORKDIR /source
-
-# RUN apt-get update  \
-#     && apt-get install -y libsqlite3-mod-spatialite \
-#     && apt-get install -y libspatialite-dev
-
-RUN apt-get update  \
-    && apt-get install -y libsqlite3-mod-spatialite 
-
-RUN  dotnet tool install --global dotnet-ef
-ENV PATH="$PATH:/root/.dotnet/tools"
-
-
-# This is the architecture you’re building for, which is passed in by the builder.
-# Placing it here allows the previous steps to be cached across architectures.
-ARG TARGETARCH
-
-# Build the application.
-# Leverage a cache mount to /root/.nuget/packages so that subsequent builds don't have to re-download packages.
-# If TARGETARCH is "amd64", replace it with "x64" - "x64" is .NET's canonical name for this and "amd64" doesn't
-#   work in .NET 6.0.
 WORKDIR /source/AEBackend
 
-CMD dotnet run 
+# RUN dotnet add package Microsoft.EntityFrameworkCore.Design && \
+#     dotnet tool install --global dotnet-ef
 
+
+CMD dotnet run --no-launch-profile --project AEBackend.csproj
 
 #### TARGET: final
 # If you need to enable globalization and time zones:
