@@ -47,25 +47,6 @@ services:
     networks:
       - dev
 
-  test:
-    build:
-      context: .
-      target: test
-    ports:
-      - 8080:8080
-      - 443:443
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal
-    volumes:
-      - ~/.aspnet/https:/https:ro
-      - .:/source
-
-    networks:
-      - dev
   db:
     image: postgis/postgis:12-3.4
     restart: always
