@@ -171,7 +171,7 @@ You must have dotnet sdk installed in your system since the tests is not running
 make
 ```
 
-Wait until the startup finished. The system will try to execute the database migrations and seeder. Wait until you see message `Hosting started`.
+Wait until the startup finished. The system will try to execute the database migrations and seeder. Wait until you see message `Hosting started` in Docker Desktop.
 
 ## View Swagger
 
