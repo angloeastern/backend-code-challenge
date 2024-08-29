@@ -173,6 +173,8 @@ make
 
 Wait until the startup finished. The system will try to execute the database migrations and seeder. Wait until you see message `Hosting started` in Docker Desktop.
 
+Read the `View Swagger` section to know how to call the API.
+
 ## View Swagger
 
 Make sure you have followed the steps on `How to Run` properly. Open
