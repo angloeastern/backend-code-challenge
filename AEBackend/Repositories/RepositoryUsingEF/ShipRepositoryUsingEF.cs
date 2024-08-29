@@ -45,4 +45,11 @@ public class ShipRepositoryUsingEF
 
     return existingShip;
   }
+
+  public async Task<List<Ship>> RetrieveShipsByIds(string[] shipIds)
+  {
+    var existingShips = await _AppDBContext.Ships.Where(ship => shipIds.Contains(ship.Id)).ToListAsync();
+
+    return existingShips;
+  }
 }

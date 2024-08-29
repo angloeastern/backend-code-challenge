@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using NetTopologySuite.Geometries;
 
 
@@ -10,6 +11,7 @@ public class Ship
   public double Lat { get; set; } = 0;
   public double Longi { get; set; } = 0;
 
+  [JsonIgnore]
   public ICollection<UserShip> UserShips { get; set; } = [];
 
   public TimeSpan EstimatedArrivalTimeTo(Port port)

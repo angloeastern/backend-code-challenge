@@ -288,7 +288,6 @@ public class ShipsControllerTest : BaseControllerTest
   }
 
   [Theory]
-  [Trait("TraitName", "Filtered")]
   [InlineData(-1, "The field KnotVelocity must be between 0 and 60.")]
   [InlineData(61, "The field KnotVelocity must be between 0 and 60.")]
   public async Task Test_Update_Ship_Velocity_MustValidateRequestsCorrectly(double knotVelocity, string errorMessage)

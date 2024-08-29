@@ -7,6 +7,8 @@ using AEBackend.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Annotations;
 using AEBackend.Controllers.Utils;
+using AEBackend.Repositories.RepositoryUsingEF;
+using System.Text.Json;
 
 namespace AEBackend.Controllers;
 
@@ -16,14 +18,17 @@ public class UsersController : ApplicationController
 {
 
   private IUserRepository _userRepository;
+  private ShipRepositoryUsingEF _shipRepository;
   private UserManager<User> _userManager;
   private IConfiguration _configuration;
 
-  public UsersController(IUserRepository userRepository, UserManager<User> userManager, IConfiguration configuration)
+  public UsersController(IUserRepository userRepository, UserManager<User> userManager, IConfiguration configuration,
+      ShipRepositoryUsingEF shipRepository)
   {
     _userRepository = userRepository;
     _userManager = userManager;
     _configuration = configuration;
+    _shipRepository = shipRepository;
   }
 
 
@@ -50,7 +55,7 @@ public class UsersController : ApplicationController
     }
   }
 
-  [HttpGet("{id}/Ships")]
+  [HttpGet("{userId}/Ships")]
   [SwaggerOperation("See ships assigned to a specific user")]
   public async Task<ApiResult<List<User>>> GetShips()
   {
@@ -66,19 +71,46 @@ public class UsersController : ApplicationController
     }
   }
 
-  [HttpPut("{id}/Ships")]
+  [HttpPut("{userId}/Ships")]
   [SwaggerOperation("Update ships assigned to a user")]
-  public async Task<ApiResult<List<User>>> UpdateShips()
+  public async Task<ApiResult<User>> UpdateShips([FromRoute] string userId, [FromBody] UpdateShipsAssignedToUserRequest updateShipsAssignedToUserRequest)
   {
     try
     {
-      var users = await _userRepository.GetAllUsers();
+      if (ModelState.IsValid)
+      {
+        var existingUser = await _userRepository.GetUserById(userId);
+        if (existingUser == null)
+        {
+          return ApiResult.Failure<User>("User not found");
+        }
 
-      return ApiResult.Success(users);
+        List<Ship> existingShips = await _shipRepository.RetrieveShipsByIds(updateShipsAssignedToUserRequest.ShipdIds);
+
+
+
+        var existingShipsIds = existingShips.Select(x => x.Id).ToList();
+        foreach (var requestedShipId in updateShipsAssignedToUserRequest.ShipdIds)
+        {
+          if (!existingShipsIds.Contains(requestedShipId))
+          {
+            return ApiResult.Failure<User>($"Ship with id: {requestedShipId} is not found");
+          }
+        }
+
+        var updatedUser = await _userRepository.UpdateUserShips(existingUser, updateShipsAssignedToUserRequest.ShipdIds);
+
+        Console.WriteLine("Id:" + JsonSerializer.Serialize(updatedUser.UserShips));
+        return ApiResult.Success<User>(updatedUser);
+      }
+      else
+      {
+        return ApiResult.Failure<User>(string.Join(", ", GetModelStateErrors()));
+      }
     }
     catch (System.Exception ex)
     {
-      return ApiResult.Failure<List<User>>(new ApiError(ex.ToString()));
+      return ApiResult.Failure<User>(new ApiError(ex.ToString()));
     }
   }
 
