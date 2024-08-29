@@ -43,8 +43,6 @@ WORKDIR /source/AEBackend.Tests
 
 ARG TARGETARCH
 
-RUN dotnet test --logger "console;verbosity=detailed" 
-
 #### TARGET: development
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS development
 COPY --from=build /source /source
