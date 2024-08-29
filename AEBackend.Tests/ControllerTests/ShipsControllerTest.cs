@@ -216,7 +216,11 @@ public class ShipsControllerTest : BaseControllerTest
 
     Assert.Equal(true, responseRetrieveData.isSuccess);
     Assert.Equal(3, responseRetrieveData.data.Count);
-    Assert.Equal("Ship-ABC-1", responseRetrieveData.data[0].name);
+
+    List<dynamic> existingShips = responseRetrieveData.data;
+    Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-1"));
+    Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-2"));
+    Assert.True(existingShips.Select(x => x.name).Contains("Ship-ABC-3"));
 
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
 

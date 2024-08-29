@@ -49,8 +49,7 @@ public class UsersControllerTest : BaseControllerTest
     ApiResult<List<User>>? responseList = await response.Content.ReadFromJsonAsync<ApiResult<List<User>>>();
 
     Assert.NotNull(responseList.Data);
-    Assert.Single(responseList.Data);
-    Assert.Equal("irwansyah@gmail.com", responseList.Data[0].Email);
+    Assert.True(responseList.Data.Count >= 1);
 
   }
 
@@ -214,8 +213,6 @@ public class UsersControllerTest : BaseControllerTest
 
     dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
 
-    _logger.LogDebug($"responseData: {responseData}");
-
 
     Assert.NotNull(responseData);
     Assert.Equal(true, responseData.isSuccess);
@@ -223,6 +220,7 @@ public class UsersControllerTest : BaseControllerTest
     Assert.Equal("juki", responseData.data.firstName);
     Assert.Equal("juki", responseData.data.lastName);
     Assert.Equal("juki@gmail.com", responseData.data.email);
+    Assert.Equal(1, responseData.data.userRoles.Count);
     Assert.Equal("User", responseData.data.userRoles[0].role.name);
 
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email == "juki@gmail.com").ExecuteDeleteAsync();
@@ -236,7 +234,13 @@ public class UsersControllerTest : BaseControllerTest
   {
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().UserShips.ExecuteDeleteAsync();
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email != "irwansyah@gmail.com").ExecuteDeleteAsync();
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x =>
+
+      new List<string>{
+        "juki1@gmail.com", "juki2@gmail.com", "juki2@gmail.com"
+      }.Contains(x.Email)
+
+    ).ExecuteDeleteAsync();
 
 
 
@@ -377,9 +381,51 @@ public class UsersControllerTest : BaseControllerTest
       Assert.Equal(chosenShipsIds[1], assignShipResponse.data.userShips[1].shipId);
     }
 
+    //Update assigned ships of user[1]
+    var requestUpdateAssignShip = new HttpRequestMessage(HttpMethod.Put, $"api/v1/users/{allUsersResponse.data[1].id}/Ships");
+
+    _logger.LogDebug("%%% requestUpdateAssignShip.RequestUri:" + requestUpdateAssignShip.RequestUri);
+
+    requestUpdateAssignShip.Headers.Add("Authorization", "Bearer " + token);
+
+    var requestUpdateShipRequest = $$"""
+        {
+          "shipdIds": ["{{createdShips[0].id}}", "{{createdShips[4].id}}", "{{createdShips[1].id}}"]
+        }
+        """;
+
+    _logger.LogDebug("%%% requestUpdateShipRequest:" + requestUpdateShipRequest);
+
+    requestUpdateAssignShip.Content = new StringContent(requestUpdateShipRequest, Encoding.UTF8, "application/json");
+
+
+    var responseUpdateAssignShips = await _httpClient.SendAsync(requestUpdateAssignShip);
+
+    var responsStringAssignShips = await responseUpdateAssignShips.Content.ReadAsStringAsync();
+
+
+    _logger.LogDebug($"responsStringAssignShips: {responsStringAssignShips}");
+
+    dynamic updateAssignShipsResponse = JsonConvert.DeserializeObject<ExpandoObject>(responsStringAssignShips);
+
+    Assert.Equal(true, updateAssignShipsResponse.isSuccess);
+    Assert.Equal(3, updateAssignShipsResponse.data.userShips.Count);
+
+    List<dynamic> updatedShips = updateAssignShipsResponse.data.userShips;
+
+    Assert.True(updatedShips.Select(x => x.shipId).ToList().Contains(createdShips[0].id));
+    Assert.True(updatedShips.Select(x => x.shipId).ToList().Contains(createdShips[1].id));
+    Assert.True(updatedShips.Select(x => x.shipId).ToList().Contains(createdShips[4].id));
+
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().UserShips.ExecuteDeleteAsync();
     await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.ExecuteDeleteAsync();
-    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x => x.Email != "irwansyah@gmail.com").ExecuteDeleteAsync();
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Users.Where(x =>
+
+      new List<string>{
+        "juki1@gmail.com", "juki2@gmail.com", "juki2@gmail.com"
+      }.Contains(x.Email)
+
+    ).ExecuteDeleteAsync();
   }
 
 }

@@ -14,21 +14,21 @@ public class UserRepositoryUsingEF : IUserRepository
     _AppDBContext = AppDBContext;
     _logger = logger;
   }
-  public async Task CreateUser(User user)
+  public async Task<User?> CreateUser(User user, string role)
   {
+    var assignedRole = await _AppDBContext.Roles.Where(x => x.Name == role).SingleOrDefaultAsync();
 
-    await _AppDBContext.Users.AddAsync(user);
+    user.UserRoles = [
+      new ApplicationUserRole{
+        RoleId = assignedRole.Id,
+        UserId = user.Id
+      }
+    ];
 
-    var role = AppRoles.Get(user.UserRoles!.First()!.Role!.Name!)!;
-
-    ApplicationUserRole identityUserRole = new()
-    {
-      RoleId = role.Id,
-      UserId = user.Id
-    };
-
-    await _AppDBContext.UserRoles.AddAsync(identityUserRole);
+    _AppDBContext.Users.Add(user);
     await _AppDBContext.SaveChangesAsync();
+
+    return await _AppDBContext.Users.Where(x => x.Id == user.Id).SingleOrDefaultAsync();
   }
 
   public async Task<List<User>> GetAllUsers()
@@ -53,31 +53,29 @@ public class UserRepositoryUsingEF : IUserRepository
 
   public Task<User?> GetUserById(string id)
   {
-    return _AppDBContext.Users.Include(u => u.UserShips).ThenInclude(s => s.Ship).Where(x => x.Id == id).SingleOrDefaultAsync();
+    return _AppDBContext.Users.Include(x => x.UserRoles).ThenInclude(ur => ur.Role).Include(u => u.UserShips).ThenInclude(s => s.Ship).Where(x => x.Id == id).SingleOrDefaultAsync();
   }
 
   public async Task<User> UpdateUserShips(User existingUser, string[] shipdIds)
   {
 
-    Console.WriteLine("A");
     var updatingUser = await GetUserById(existingUser.Id);
-    await _AppDBContext.UserShips.Where(us => updatingUser.UserShips.Select(usx => usx.ShipId).Contains(us.ShipId)).ExecuteDeleteAsync();
 
-    Console.WriteLine("B");
+    _AppDBContext.RemoveRange(updatingUser.UserShips);
+    await _AppDBContext.SaveChangesAsync();
+
+
     shipdIds.ToList().ForEach(shipId =>
     {
       var newUserShip = new UserShip() { ShipId = shipId, UserId = existingUser.Id };
-      existingUser.UserShips.Add(newUserShip);
-      _AppDBContext.UserShips.Add(newUserShip);
+
+      updatingUser.UserShips.Add(newUserShip);
     });
 
-    Console.WriteLine("C");
     await _AppDBContext.SaveChangesAsync();
 
-    Console.WriteLine("D");
     var updatedUser = await GetUserById(existingUser.Id);
 
-    Console.WriteLine("E");
     return updatedUser;
   }
 }

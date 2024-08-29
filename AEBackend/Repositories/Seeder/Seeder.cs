@@ -36,46 +36,18 @@ public class Seeder
         Id = ADMIN_ID,
         Email = "irwansyah@gmail.com",
         EmailConfirmed = true,
-        FirstName = "Irwansyah" + _appDBContext.ContextId,
+        FirstName = "Irwansyah",
         LastName = "Irwansyah",
         UserName = "irwansyah@gmail.com",
         NormalizedUserName = "IRWANSYAH@GMAIL.COM",
         NormalizedEmail = "IRWANSYAH@GMAIL.COM",
       };
 
-      _logger.LogDebug("DB CONTEXT ID:" + _appDBContext.ContextId + ". ADDING ADMIN USER");
 
       PasswordHasher<User> ph = new();
       adminUser.PasswordHash = ph.HashPassword(adminUser, "Abcd1234!");
 
-      var allUsers = _appDBContext.Users.ToList();
-      allUsers.ForEach(u =>
-      {
-        _logger.LogDebug("EXISTING USER EMAIL:" + u.Email + " ID:" + u.Id);
-      });
-
-      try
-      {
-        _logger.LogDebug("******** BEFORE ADDING USER adminUserID:" + adminUser.Id);
-
-        foreach (var dbEntityEntry in _appDBContext.ChangeTracker.Entries<User>())
-        {
-          _logger.LogDebug("******** GTracker user id:" + dbEntityEntry.Entity.Id);
-        }
-
-        await _appDBContext.Users.AddAsync(adminUser);
-
-      }
-      catch (System.Exception)
-      {
-        _logger.LogDebug("******** ERROR WHEN ADDING USER adminUserID:" + adminUser.Id);
-
-        foreach (var dbEntityEntry in _appDBContext.ChangeTracker.Entries<User>())
-        {
-          _logger.LogDebug("******** GTracker user id:" + dbEntityEntry.Entity.Id + " fname:" + dbEntityEntry.Entity.FirstName);
-        }
-      }
-
+      _appDBContext.Users.Add(adminUser);
 
       ApplicationUserRole identityUserRole = new()
       {
@@ -85,7 +57,6 @@ public class Seeder
 
       _appDBContext.UserRoles.Add(identityUserRole);
 
-      _logger.LogDebug("******* Calling SaveChangesAsync");
       await _appDBContext.SaveChangesAsync();
     }
 
@@ -93,20 +64,38 @@ public class Seeder
 
   private async Task SeedUserRoles()
   {
-    if (!_appDBContext.Roles.Any(x => x.Name == AppRoles.Administrator.Name))
+    if (!_appDBContext.Roles.Any(x => x.Id == AppRoles.Administrator.Id))
     {
-      await _appDBContext.Roles.AddAsync(AppRoles.Administrator);
+      _appDBContext.Roles.Add(new ApplicationRole
+      {
+        Id = AppRoles.Administrator.Id,
+        Name = AppRoles.Administrator.Name,
+        NormalizedName = AppRoles.Administrator.NormalizedName
+      });
+      await _appDBContext.SaveChangesAsync();
     }
-    if (!_appDBContext.Roles.Any(x => x.Name == AppRoles.User.Name))
+    if (!_appDBContext.Roles.Any(x => x.Id == AppRoles.User.Id))
     {
-      await _appDBContext.Roles.AddAsync(AppRoles.User);
+      _appDBContext.Roles.Add(new ApplicationRole
+      {
+        Id = AppRoles.User.Id,
+        Name = AppRoles.User.Name,
+        NormalizedName = AppRoles.User.NormalizedName
+      });
+      await _appDBContext.SaveChangesAsync();
     }
-    if (!_appDBContext.Roles.Any(x => x.Name == AppRoles.VipUser.Name))
+    if (!_appDBContext.Roles.Any(x => x.Id == AppRoles.VipUser.Id))
     {
-      await _appDBContext.Roles.AddAsync(AppRoles.VipUser);
+      _appDBContext.Roles.Add(new ApplicationRole
+      {
+        Id = AppRoles.VipUser.Id,
+        Name = AppRoles.VipUser.Name,
+        NormalizedName = AppRoles.VipUser.NormalizedName
+      });
+      await _appDBContext.SaveChangesAsync();
     }
 
-    await _appDBContext.SaveChangesAsync();
+
 
   }
 

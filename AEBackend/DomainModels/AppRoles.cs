@@ -8,8 +8,7 @@ public static class AppRoles
   public static readonly ApplicationRole Administrator = new ApplicationRole()
   {
     Id = "4b390270-3075-4a64-814a-6f7223e921b1",
-    Name =
-    AdministratorRole,
+    Name = AdministratorRole,
     NormalizedName = "ADMIN"
   };
   public static readonly ApplicationRole User = new ApplicationRole()

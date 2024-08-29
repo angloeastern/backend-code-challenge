@@ -87,10 +87,11 @@ public class UsersController : ApplicationController
 
         List<Ship> existingShips = await _shipRepository.RetrieveShipsByIds(updateShipsAssignedToUserRequest.ShipdIds);
 
+        var distincShipids = updateShipsAssignedToUserRequest.ShipdIds.Distinct().ToList();
 
 
         var existingShipsIds = existingShips.Select(x => x.Id).ToList();
-        foreach (var requestedShipId in updateShipsAssignedToUserRequest.ShipdIds)
+        foreach (var requestedShipId in distincShipids)
         {
           if (!existingShipsIds.Contains(requestedShipId))
           {
@@ -98,9 +99,8 @@ public class UsersController : ApplicationController
           }
         }
 
-        var updatedUser = await _userRepository.UpdateUserShips(existingUser, updateShipsAssignedToUserRequest.ShipdIds);
+        var updatedUser = await _userRepository.UpdateUserShips(existingUser, distincShipids.ToArray());
 
-        Console.WriteLine("Id:" + JsonSerializer.Serialize(updatedUser.UserShips));
         return ApiResult.Success<User>(updatedUser);
       }
       else
@@ -130,8 +130,10 @@ public class UsersController : ApplicationController
         return ApiResult.Failure<User>("Role is not valid");
       }
 
+      var userId = Guid.NewGuid().ToString();
       var user = new User
       {
+        Id = userId,
         FirstName = createUserRequest.FirstName,
         LastName = createUserRequest.LastName,
         Email = createUserRequest.Email,
@@ -139,15 +141,14 @@ public class UsersController : ApplicationController
         SecurityStamp = Guid.NewGuid().ToString(),
         NormalizedUserName = createUserRequest.Email.ToUpper(),
         NormalizedEmail = createUserRequest.Email.ToUpper(),
-        UserRoles = [new ApplicationUserRole() { Role = new ApplicationRole { Name = createUserRequest.Role } }]
       };
 
       PasswordHasher<User> ph = new();
       user.PasswordHash = ph.HashPassword(user, createUserRequest.Password);
 
-      await _userRepository.CreateUser(user);
+      var createdUser = await _userRepository.CreateUser(user, createUserRequest.Role);
 
-      return ApiResult.Success(user);
+      return ApiResult.Success(createdUser);
     }
     else
     {
