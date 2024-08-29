@@ -157,7 +157,15 @@ dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p password
 dotnet dev-certs https --trust
 ```
 
-3. Run
+3. Run the tests:
+
+```
+make test
+```
+
+You must have dotnet sdk installed in your system since the tests is not running inside a Docker container.
+
+4. Run
 
 ```
 make
@@ -172,3 +180,10 @@ Make sure you have followed the steps on `How to Run` properly. Open
 ```
 https://localhost/swagger
 ```
+
+1. Retrieve login token to call API through Swagger
+
+1. Login using email: `irwansyah@gmail.com` and password: `Abcd1234!`
+1. Retrieve the token
+1. Click the `Authorize` button on Swagger and enter `Bearer <TOKEN>`. Where `<TOKEN> is the token you get from Login
+1. Choose and call an API
