@@ -7,15 +7,15 @@
   - [x] https://medium.com/@celery_liu/asp-net-core-web-api-with-swagger-api-versioning-for-dotnet-8-c8ce2fd7808c
 - [ ] Generating a code coverage report
 - [ ] CI/CD for ASP.NET Core Using Azure Pipelines and GitHub Actions
-- [ ] Handling exceptions
-- [ ] Add get token endpoint for system user
-  - [x] Implementing rate-limiting
-- [ ] Add users management end points
-  - [ ] Using model validation
-- [ ] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
-- [ ] Configuring the Swagger UI to support authorization
-- [ ] Role-based authorization
-- [ ] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
+- [x] Handling exceptions
+- [x] Add get token endpoint for system user
+- [x] Implementing rate-limiting
+- [x] Add users management end points
+- [x] Using model validation
+- [x] Add ports using data [here](https://github.com/marchah/sea-ports/blob/master/lib/ports.json)
+- [x] Configuring the Swagger UI to support authorization
+- [x] Role-based authorization
+- [x] Query nearest ports to a ship referred [here](https://learn.microsoft.com/en-us/ef/core/modeling/spatial)
 - [ ] Secure the DB connection string
 
 # AE Backend Code Challenge
