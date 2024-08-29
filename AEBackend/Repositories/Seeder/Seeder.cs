@@ -131,29 +131,6 @@ public class Seeder
 
       _logger.LogDebug("Saving Ports to DB...");
       await _appDBContext.SaveChangesAsync();
-
-      double[] pointBandung = [-6.9796439391129015, 107.72736494836637];
-      double[] pointCisauk = [-6.337957856734018, 106.64177845684021];
-      double[] pointKarangAnyar = [-7.603521654106759, 111.01227712457657];
-
-      Ship ship = new Ship
-      {
-        Lat = pointBandung[0],
-        Longi = pointBandung[1],
-        Velocity = new Knot(16)
-      };
-      Point currentLocation = new Point(new Coordinate(ship.Lat, ship.Longi));
-
-
-
-      var closestPort = _appDBContext.Ports.OrderBy(p => p.Location!.Distance(currentLocation)).FirstOrDefault();
-
-      if (closestPort != null)
-      {
-        _logger.LogDebug("Closest port is:" + closestPort.Name + ", " + closestPort.City);
-        _logger.LogDebug("Closest port distance:" + closestPort.GetDistance(currentLocation).Value);
-        _logger.LogDebug("Closest port arrival time:" + ship.EstimatedArrivalTimeTo(closestPort));
-      }
     }
   }
 

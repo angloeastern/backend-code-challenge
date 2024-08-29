@@ -536,4 +536,63 @@ public class ShipsControllerTest : BaseControllerTest
     dbContext.RemoveRange(cleanUpShips);
     dbContext.SaveChanges();
   }
+
+  [Theory]
+  [Trait("TraitName", "Filtered")]
+  [InlineData("Bandung", -6.9796439391129015, 107.72736494836637, "Tanjung Priok")]
+  [InlineData("Cisauk", -6.337957856734018, 106.64177845684021, "Jakarta, Java")]
+  [InlineData("Karang Anyar", -7.603521654106759, 111.01227712457657, "Semarang")]
+  public async Task Test_NearestPort_MustReturnCorrectInformation(string areaName, double lat, double longi, string nearestPortName)
+  {
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "ShipNearest").ExecuteDeleteAsync();
+
+    var token = await GetLoginToken();
+
+
+    var request = new HttpRequestMessage(HttpMethod.Post, "api/v1/ships");
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+
+    var createShipRequest = $$"""
+    {
+      "name": "ShipNearest",
+      "knotVelocity": 10,
+      "lat": {{lat}},
+      "long": {{longi}}     
+    }
+    """;
+
+    request.Content = new StringContent(createShipRequest, Encoding.UTF8, "application/json");
+
+    var response = await _httpClient.SendAsync(request);
+
+    var responseString = await response.Content.ReadAsStringAsync();
+
+    dynamic responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+    _logger.LogDebug("$$$$$$$ responseString:" + responseString);
+
+    Assert.Equal(true, responseData.isSuccess);
+
+    //Get nearest port
+    request = new HttpRequestMessage(HttpMethod.Get, $"api/v1/ships/{responseData.data.id}/NearestPort");
+
+    _logger.LogDebug("request URi:" + request.RequestUri);
+    request.Headers.Add("Authorization", "Bearer " + token);
+
+    response = await _httpClient.SendAsync(request);
+
+    responseString = await response.Content.ReadAsStringAsync();
+    _logger.LogDebug("$$$$$$$ responseStringNearest:" + responseString);
+
+    responseData = JsonConvert.DeserializeObject<ExpandoObject>(responseString);
+
+
+
+    Assert.Equal(true, responseData.isSuccess);
+    Assert.Equal(nearestPortName, responseData.data.port.name);
+
+    await _serviceScope.ServiceProvider.GetService<AppDBContext>().Ships.Where(x => x.Name == "ShipNearest").ExecuteDeleteAsync();
+  }
+
 }

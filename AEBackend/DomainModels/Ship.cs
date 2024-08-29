@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using NetTopologySuite.Geometries;
 
@@ -23,6 +24,16 @@ public class Ship
     var arrivalTime = Velocity.ArrivalTimeTo(meterDistance);
 
     return arrivalTime;
+  }
+
+  [NotMapped]
+  [JsonIgnore]
+  public Point Location
+  {
+    get
+    {
+      return new Point(new Coordinate(Lat, Longi));
+    }
   }
 
 }

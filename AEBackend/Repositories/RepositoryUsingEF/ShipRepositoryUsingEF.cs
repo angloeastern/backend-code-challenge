@@ -1,5 +1,7 @@
+using System.Drawing;
 using AEBackend.DomainModels;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace AEBackend.Repositories.RepositoryUsingEF;
 public class ShipRepositoryUsingEF
@@ -58,5 +60,22 @@ public class ShipRepositoryUsingEF
     var unassigneds = await _AppDBContext.Ships.Include(s => s.UserShips).Where(s => s.UserShips == null || s.UserShips.Count <= 0).ToListAsync();
 
     return unassigneds;
+  }
+
+  public async Task<Ship?> GetShipById(string shipId)
+  {
+    var ship = await _AppDBContext.Ships.Where(x => x.Id == shipId).SingleOrDefaultAsync();
+
+    return ship;
+  }
+
+  public async Task<Port?> GetNearestPort(string shipId)
+  {
+    var ship = await GetShipById(shipId);
+
+    var closestPort = _AppDBContext.Ports.OrderBy(p => p.Location!.Distance(ship.Location)).FirstOrDefault();
+
+    return closestPort;
+
   }
 }

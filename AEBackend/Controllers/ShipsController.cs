@@ -118,9 +118,43 @@ public class ShipsController : ApplicationController
 
   [HttpGet("{id}/NearestPort")]
   [SwaggerOperation("See the nearest port to a ship with estimated arrival time to the port together with relevant details")]
-  public Task<ApiResult<NearestPortInfo>> GetNearest()
+  public async Task<ApiResult<NearestPortInfo>> GetNearest([FromRoute] string id)
   {
-    throw new Exception();
+    try
+    {
+      if (ModelState.IsValid)
+      {
+        var ship = await _shipRepository.GetShipById(id);
+        if (ship == null)
+        {
+          return ApiResult.Failure<NearestPortInfo>(new ApiError("Ship not found"));
+        }
+        var closesPort = await _shipRepository.GetNearestPort(id);
+        TimeSpan estimatedArrivalTime = TimeSpan.Zero;
+        NearestPortInfo nearestPortInfo = new()
+        {
+          EstimatedArrivalTime = TimeSpan.Zero,
+          Port = null
+        };
+        if (closesPort != null)
+          nearestPortInfo = new()
+          {
+            Port = closesPort,
+            EstimatedArrivalTime = ship.EstimatedArrivalTimeTo(closesPort)
+          };
+
+        return ApiResult.Success(nearestPortInfo);
+      }
+      else
+      {
+        return ApiResult.Failure<NearestPortInfo>(string.Join(", ", GetModelStateErrors()));
+      }
+    }
+    catch (System.Exception ex)
+    {
+      return ApiResult.Failure<NearestPortInfo>(new ApiError(ex.ToString()));
+    }
+
   }
 
 }

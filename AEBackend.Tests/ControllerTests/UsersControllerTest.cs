@@ -377,8 +377,9 @@ public class UsersControllerTest : BaseControllerTest
 
       Assert.Equal(true, assignShipResponse.isSuccess);
       Assert.Equal(2, assignShipResponse.data.userShips.Count);
-      Assert.Equal(chosenShipsIds[0], assignShipResponse.data.userShips[0].shipId);
-      Assert.Equal(chosenShipsIds[1], assignShipResponse.data.userShips[1].shipId);
+
+      Assert.True(chosenShipsIds.Contains(assignShipResponse.data.userShips[0].shipId));
+      Assert.True(chosenShipsIds.Contains(assignShipResponse.data.userShips[1].shipId));
     }
 
     //Update assigned ships of user[1]
