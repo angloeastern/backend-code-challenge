@@ -172,7 +172,7 @@ Budgets and actuals are recorded for child accounts, and parent account values s
 
 | Total Budget (Jan–Dec 2025) | Actual (Jul 2025) | Budget Actual (Jul 2025) | Variance Actual | Actual YTD (Jan–Jul 2025) | Budget YTD (Jan–Jul 2025) | Variance YTD (Jul 2025) |
 |-----------------------------|-------------------|--------------------------|-----------------|---------------------------|---------------------------|-------------------------|
-| 20100                       | 3300              | 3300                     | 0               | 9600                      | 9900                      | 0                       |
+| 20100                       | 3300              | 3300                     | 0               | 9600                      | 9900                      | 300                     |
 
 #### Example Output (Financial Expense Detail)
 
