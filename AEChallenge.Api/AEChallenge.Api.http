@@ -1,0 +1,6 @@
+@AEChallenge.Api_HostAddress = http://localhost:5122
+
+GET {{AEChallenge.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

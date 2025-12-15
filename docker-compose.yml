@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api:
+    image: aechallenge-api
+    build:
+      context: .
+      dockerfile: AEChallenge.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=AE_Challange;User Id=myuser;Password=mypassword;TrustServerCertificate=True;

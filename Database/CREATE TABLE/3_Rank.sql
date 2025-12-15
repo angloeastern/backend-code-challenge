@@ -1,0 +1,35 @@
+USE [AE_Challange]
+GO
+
+/****** Object:  Table [dbo].[Rank]    Script Date: 12/15/2025 5:25:19 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Rank](
+	[RankCode] [int] IDENTITY(1,1) NOT NULL,
+	[RankName] [nvarchar](50) NOT NULL,
+	[IsActive] [bit] NOT NULL,
+	[CreatedDate] [datetime2](3) NOT NULL,
+	[UpdatedDate] [datetime2](3) NULL,
+	[CreatedBy] [nvarchar](50) NULL,
+	[UpdatedBy] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RankCode] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[RankName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Rank] ADD  DEFAULT ((1)) FOR [IsActive]
+GO
+
+ALTER TABLE [dbo].[Rank] ADD  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+
