@@ -15,9 +15,19 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["AEChallenge.Api/AEChallenge.Api.csproj", "AEChallenge.Api/"]
-RUN dotnet restore "./AEChallenge.Api/AEChallenge.Api.csproj"
+COPY ["AEChallenge.Api.Tests/AEChallenge.Api.Tests.csproj", "AEChallenge.Api.Tests/"]
+COPY ["AEChallenge.Application/AEChallenge.Application.csproj", "AEChallenge.Application/"]
+COPY ["AEChallenge.Domain/AEChallenge.Domain.csproj", "AEChallenge.Domain/"]
+COPY ["AEChallenge.Infrastructure/AEChallenge.Infrastructure.csproj", "AEChallenge.Infrastructure/"]
+COPY ["AEChallenge.Application.Tests/AEChallenge.Application.Tests.csproj", "AEChallenge.Application.Tests/"]
+COPY ["AEChallenge.Domain.Tests/AEChallenge.Domain.Tests.csproj", "AEChallenge.Domain.Tests/"]
+COPY ["AEChallenge.Infrastructure.Tests/AEChallenge.Infrastructure.Tests.csproj", "AEChallenge.Infrastructure.Tests/"]
+COPY ["AEChallenge.sln", "./"]
+
+RUN dotnet restore "AEChallenge.sln"
 COPY . .
-RUN dotnet test "AEChallenge.sln"
+# Run tests and collect coverage. If this step fails, the build fails.
+RUN dotnet test "AEChallenge.sln" --verbosity normal --collect:"XPlat Code Coverage" --results-directory /app/testresults
 WORKDIR "/src/AEChallenge.Api"
 RUN dotnet build "./AEChallenge.Api.csproj" -c %BUILD_CONFIGURATION% -o /app/build
 
