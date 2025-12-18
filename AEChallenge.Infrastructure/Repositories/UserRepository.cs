@@ -7,6 +7,15 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using AEChallenge.Application.DTOs.Request;
+using AEChallenge.Application.DTOs.Response;
+using AEChallenge.Application.Extensions;
+using AEChallenge.Application.Interfaces;
+using AEChallenge.Infrastructure.Data;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 using System.Security.Claims;
 
 namespace AEChallenge.Infrastructure.Repositories

@@ -10,14 +10,13 @@ public class ApiKeyMiddleware(RequestDelegate next)
 
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
-        // Bypass API Key check for Swagger and Root
+ 
         var path = context.Request.Path;
-        if (path.StartsWithSegments("/swagger") || path.Value == "/")
+        if (path.StartsWithSegments("/swagger") || path.Value == "/" || path.Value == "/health")
         {
             await _next(context);
             return;
         }
-
         async Task WriteJsonResponse(string message)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;

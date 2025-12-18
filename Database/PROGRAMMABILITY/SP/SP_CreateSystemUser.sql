@@ -27,7 +27,7 @@ BEGIN
         SET @PasswordHash = HASHBYTES('SHA2_256', @Password); 
         IF EXISTS (SELECT 1 FROM [dbo].[SystemUser] WHERE UserName = @UserName)
         BEGIN
-            THROW 50000, N'Username sudah ada (Duplicate key violation).', 1;
+            THROW 50000, N'Username already exists (Duplicate key violation).', 1;
         END
         INSERT INTO [dbo].[SystemUser] (
             UserName, PasswordHash, UserRole, IsActive, CreatedDate, CreatedBy

@@ -121,25 +121,109 @@ The system is fully documented via Swagger UI, allowing you to test every endpoi
 
 ### Sample Requests (cURL)
 
-**1. Login (Get Token)**
+**1. Create User (Admin)**
 ```bash
-curl -X 'POST' \
-  'https://localhost:7291/api/v1/auth/login' \
-  -H 'accept: */*' \
-  -H 'AE_Key: helloworld' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "username": "adminUser",
-  "password": "123456789"
+curl --request POST \
+  --url 'https://localhost:7291/api/v1/user?SearchTerm=AA&PageSize=1&PageNumber=22&SortColumn=2a&SortDirection=Aa' \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain' \
+  --data '{
+  "userName": "john.doe1",
+  "password": "123456789",
+  "userRole": "Administrator"
 }'
 ```
 
-**2. Get Financial Report**
+**2. List Users**
 ```bash
-curl -X 'GET' \
-  'https://localhost:7291/api/v1/finance/summaryreport?ShipCode=SHIP001&PeriodId=202501' \
-  -H 'accept: */*' \
-  -H 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
-  -H 'AE_Key: helloworld'
+curl --request GET \
+  --url 'https://localhost:7291/api/v1/user?SearchTerm=&PageSize=22&PageNumber=1&SortColumn=USerId&SortDirection=ASC' \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain'
 ```
-*(Note: Replace `https://localhost:7291` with `http://localhost:8080` if using Docker)*
+
+**3. Get Financial Detail Report**
+```bash
+curl --request GET \
+  --url 'https://localhost:7291/api/v1/finance/detailreport?ShipCode=SHIP001&PeriodId=202501' \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain'
+```
+
+**4. List Ships**
+```bash
+curl --request GET \
+  --url 'https://localhost:7291/api/v1/ship/shiplist?Status=Active&PageSize=10&PageNumber=1&SortColumn=ShipCode&SortDirection=ASC&SearchTerm=SHIP001' \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain'
+```
+
+**5. Get Ship Assignment by User**
+```bash
+curl --request GET \
+  --url https://localhost:7291/api/v1/ship/shipbyuser/23 \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain'
+```
+
+**6. Create Ship**
+```bash
+curl --request POST \
+  --url https://localhost:7291/api/v1/ship \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain' \
+  --data '{
+    "shipCode": "MV039",
+    "shipName": "Marine Vessel Atlantis Explorer",
+    "fiscalYear": 2026,
+    "status": "Active" 
+}'
+```
+
+**7. Assign Ship to User**
+```bash
+curl --request POST \
+  --url https://localhost:7291/api/v1/ship/assignment \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain' \
+  --data '{
+  "UserId": 25,
+  "ShipCode": "SHIP001"
+}'
+```
+
+**8. Get Crew List**
+```bash
+curl --request GET \
+  --url 'https://localhost:7291/api/v1/crew/crewlist?SearchTerm=&PageSize=100&PageNumber=1&SortColumn=firstname&SortDirection=ASC&ShipCode=SHIP001' \
+  --header 'AE_Key: helloworld' \
+  --header 'Authorization: Bearer <YOUR_TOKEN_HERE>' \
+  --header 'Content-Type: application/json' \
+  --header 'accept: text/plain'
+```
+
+## 8. Middleware & Operational Features
+
+The application consumes several key middlewares to ensure robustness and observability:
+
+*   **Exception Handling**: `app.UseMiddleware<ExceptionHandlingMiddleware>()`
+    *   catches all unhandled exceptions globally and returns a standardized JSON error response (HTTP 500) to the client, preventing stack trace exposure.
+*   **Rate Limiting**: `app.UseRateLimiter()`
+    *   Protects the API from abuse by limiting the number of requests a client can make within a specific time window.
+*   **Health Checks**: `app.MapHealthChecks("/health", ...)`
+    *   Exposes a `/health` endpoint to allow load balancers or monitoring systems to check if the API and its dependencies (Database) are responsive.
+

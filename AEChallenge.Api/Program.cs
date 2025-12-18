@@ -1,22 +1,10 @@
 ﻿using AEChallenge.Api.Extensions;
 using AEChallenge.Api.Middlewares;
-using AEChallenge.Application.Interfaces;
 using AEChallenge.Infrastructure.Data;
-using AEChallenge.Infrastructure.Repositories;
-using AEChallenge.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
-
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace AEChallenge.Api
 {
@@ -39,10 +27,11 @@ namespace AEChallenge.Api
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString).LogTo(Console.WriteLine, LogLevel.Information));
 
+            builder.Services.AddHealthCheckAppAndDB(builder.Configuration);
             builder.Services.AddCorsSetup(builder.Configuration);
-
             builder.Services.AddApplicationServices();
             builder.Services.AddJwtAuthentication(builder.Configuration);
+            ;
 
             builder.Services.AddApiVersioning(options =>
             {
@@ -57,6 +46,7 @@ namespace AEChallenge.Api
             });
 
             builder.Services.AddSwaggerSetup();
+            builder.Services.AddRateLimiterReport(builder.Configuration);
 
             var app = builder.Build();
 
@@ -81,10 +71,31 @@ namespace AEChallenge.Api
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseRateLimiter();
+            app.MapHealthChecks("/health", new HealthCheckOptions
+            {
+                ResponseWriter = async (context, report) =>
+                {
+                    context.Response.ContentType = "application/json";
+
+                    var response = new
+                    {
+                        status = report.Status.ToString(),
+                        checks = report.Entries.Select(x => new
+                        {
+                            component = x.Key,
+                            status = x.Value.Status.ToString(),
+                            description = x.Value.Description
+                        }),
+                        duration = report.TotalDuration
+                    };
+
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                }
+            }).AllowAnonymous().DisableRateLimiting();
 
             app.MapControllers();
 
-            // Redirect root URL to Swagger UI
             app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
             app.Run();

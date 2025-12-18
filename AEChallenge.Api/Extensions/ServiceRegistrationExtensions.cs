@@ -5,6 +5,8 @@ using AEChallenge.Infrastructure.Repositories;
 using AEChallenge.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -158,7 +160,50 @@ namespace AEChallenge.Api.Extensions
 
             return services;
         }
+        public static IServiceCollection AddRateLimiterReport(this IServiceCollection services, IConfiguration configuration)
+        {
+           services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter(policyName: "ReportPolicy", fixedOptions =>
+                {
+                    fixedOptions.PermitLimit = 1;
+                    fixedOptions.Window = TimeSpan.FromMinutes(1); 
+                    fixedOptions.QueueLimit = 0;             
+                });
 
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                    context.HttpContext.Response.ContentType = "application/json";
+
+                    var response = new
+                    {
+                        isSuccess = false,
+                        status = "TooManyRequests",
+                        message = "Report access limit reached. Try again in a minute.",
+                        data = (object?)null
+                    };
+
+                    await context.HttpContext.Response.WriteAsync(JsonSerializer.Serialize(response), token);
+                };
+            });
+
+            return services;
+        }
+        public static IServiceCollection AddHealthCheckAppAndDB(this IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            services.AddHealthChecks()
+               .AddSqlServer(
+                   connectionString: connectionString,
+                   name: "ms-sql-server",
+                   healthQuery: "SELECT 1;",
+                   failureStatus: HealthStatus.Unhealthy,
+                   tags: new[] { "db", "sql", "mssql" }
+               );
+
+            return services;
+        }
     }
 
 }

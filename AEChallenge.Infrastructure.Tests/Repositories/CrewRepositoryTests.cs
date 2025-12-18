@@ -9,7 +9,11 @@ using Xunit;
 
 namespace AEChallenge.Infrastructure.Tests.Repositories
 {
- 
+    /// <summary>
+    /// Unit tests for CrewRepository
+    /// Note: Since the repository uses stored procedures, these tests focus on
+    /// constructor and interface validation.
+    /// </summary>
     public class CrewRepositoryTests
     {
         [Fact]

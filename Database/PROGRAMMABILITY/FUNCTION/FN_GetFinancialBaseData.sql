@@ -29,16 +29,13 @@ RETURN
         C_Child.ParentCOA_ID,
         C_Child.AccountType,
 
-        -- COA Parent (Induk)
         C_Parent.AccountNumber AS ParentAccountNumber,
         C_Parent.AccountDescription AS ParentAccountDescription,
     
-        -- Data Current Period (Diubah: Current_Actual -> CurrentActual)
         MFD.Actual AS CurrentActual,
         MFD.Budget AS CurrentBudget,
         MFD.Variance AS CurrentVariance,
-        
-        -- Data YTD (Diubah: YTD_Actual -> YTDActual)
+       
         ISNULL(YTD.YTD_Actual, 0) AS YTDActual,
         ISNULL(YTD.YTD_Budget, 0) AS YTDBudget,
         ISNULL(YTD.YTD_Variance, 0) AS YTDVariance,

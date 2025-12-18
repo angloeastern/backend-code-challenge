@@ -25,19 +25,16 @@ BEGIN
     BEGIN TRANSACTION;
 
     BEGIN TRY
-        -- 1. Validasi Business Logic (Cek ShipCode Duplikat)
         IF EXISTS (SELECT 1 FROM [dbo].[Ship] WHERE ShipCode = @ShipCode)
         BEGIN
-            THROW 50000, N'Kode Kapal (ShipCode) sudah ada (Duplicate key violation).', 1;
+            THROW 50000, N'Ship Code already exists (Duplicate key violation).', 1;
         END
-
-        -- 2. Insert ke Tabel Ship
         INSERT INTO [dbo].[Ship] (
             ShipCode, 
             ShipName, 
             FiscalYear, 
             Status, 
-            IsActive, -- Kolom tetap di-insert
+            IsActive, 
             CreatedDate, 
             CreatedBy
         )
@@ -46,18 +43,15 @@ BEGIN
             @ShipName, 
             @FiscalYear, 
             @Status, 
-            1, -- Nilai default 1 (Aktif) dimasukkan langsung
+            1, 
             GETDATE(), 
             @CreatedBy
         );
         
-        -- Ambil ShipCode yang baru dibuat (untuk return value)
         SET @NewShipCode = @ShipCode;
         
-        -- 3. Commit Transaksi
         COMMIT TRANSACTION;
         
-        -- 4. RETURN VALUE SEBAGAI RESULT SET
         SELECT 
             ShipCode, 
             ShipName, 
@@ -71,9 +65,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION;
-            
-        -- Meneruskan error
+            ROLLBACK TRANSACTION;            
         THROW;
     END CATCH
 END

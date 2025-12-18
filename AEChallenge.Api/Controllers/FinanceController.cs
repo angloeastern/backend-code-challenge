@@ -4,7 +4,7 @@ using AEChallenge.Application.DTOs.Response;
 using AEChallenge.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AEChallenge.Api.Controllers
 {
@@ -12,13 +12,14 @@ namespace AEChallenge.Api.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/finance")]
     [Authorize(Roles = UserRoles.HighPrivilegeRoles)]
-    [Authorize]
+   
     public class FinanceController(IFinanceRepository financeRepository, ILogger<FinanceController> logger) : ControllerBase
     {
         private readonly IFinanceRepository _financeRepository = financeRepository;
         private readonly ILogger<FinanceController> _logger = logger;
 
         [HttpGet("summaryreport")]
+        [EnableRateLimiting("ReportPolicy")]
         public async Task<IActionResult> GetFinancialSummaryReport([FromQuery] FinancialReportParameters parameters)
         {
             var (IsValid, ErrorMessage) = parameters.Validate();
